@@ -5,12 +5,12 @@ import requests
 from check_msdefender.core.exceptions import DefenderAPIError
 from check_msdefender.core.logging_config import get_verbose_logger
 
-APPLICATION_JSON = 'application/json'
 
 
 class DefenderClient:
     """Client for Microsoft Defender API."""
-    
+    application_json = 'application/json'
+
     def __init__(self, authenticator, timeout=5, region="eu3", verbose_level=0):
         """Initialize with authenticator and optional region.
         
@@ -45,7 +45,7 @@ class DefenderClient:
         url = f"{self.base_url}/api/machines"
         headers = {
             'Authorization': f'Bearer {token}',
-            'Content-Type': APPLICATION_JSON
+            'Content-Type': DefenderClient.application_json
         }
         
         params = {
@@ -79,7 +79,7 @@ class DefenderClient:
         url = f"{self.base_url}/api/machines/{machine_id}"
         headers = {
             'Authorization': f'Bearer {token}',
-            'Content-Type': APPLICATION_JSON
+            'Content-Type': DefenderClient.application_json
         }
         
         try:
@@ -97,6 +97,7 @@ class DefenderClient:
             return result
         except requests.RequestException as e:
             self.logger.debug(f"API request failed: {str(e)}")
+            self.logger.debug(f"Response: {str(e.Response)}")
             raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
     
     def get_machine_vulnerabilities(self, machine_id):
@@ -108,7 +109,7 @@ class DefenderClient:
         url = f"{self.base_url}/api/machines/{machine_id}/vulnerabilities"
         headers = {
             'Authorization': f'Bearer {token}',
-            'Content-Type': APPLICATION_JSON
+            'Content-Type': DefenderClient.application_json
         }
         
         try:
@@ -126,6 +127,7 @@ class DefenderClient:
             return result
         except requests.RequestException as e:
             self.logger.debug(f"API request failed: {str(e)}")
+            self.logger.debug(f"Response: {str(e.Response)}")
             raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
     
     def _get_token(self):
