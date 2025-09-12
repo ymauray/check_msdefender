@@ -31,7 +31,7 @@ keywords = ["nagios", "monitoring", "microsoft", "graph", "api", "azure"]
 dependencies = [
     "nagiosplugin>=1.4.0",
     "azure-identity>=1.12.0",
-    "click>=8.2.1"
+    "click>=8.0,<9.0"
 ]
 
 [project.optional-dependencies]
