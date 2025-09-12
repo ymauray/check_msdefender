@@ -28,10 +28,10 @@ def register_onboarding_commands(main_group):
             authenticator = get_authenticator(cfg)
 
             # Create Defender client
-            client = DefenderClient(authenticator)
+            client = DefenderClient(authenticator, verbose_level=verbose)
 
             # Create the appropriate service based on service
-            service = OnboardingService(client)
+            service = OnboardingService(client, verbose_level=verbose)
 
             # Create Nagios plugin
             plugin = NagiosPlugin(service)

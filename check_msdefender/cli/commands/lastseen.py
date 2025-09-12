@@ -28,10 +28,10 @@ def register_lastseen_commands(main_group):
             authenticator = get_authenticator(cfg)
 
             # Create Defender client
-            client = DefenderClient(authenticator)
+            client = DefenderClient(authenticator, verbose_level=verbose)
 
             # Create the appropriate service based on service
-            service = LastSeenService(client)
+            service = LastSeenService(client, verbose_level=verbose)
 
             # Create Nagios plugin
             plugin = NagiosPlugin(service)

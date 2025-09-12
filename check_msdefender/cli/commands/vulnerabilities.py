@@ -28,10 +28,10 @@ def register_vulnerability_commands(main_group):
             authenticator = get_authenticator(cfg)
 
             # Create Defender client
-            client = DefenderClient(authenticator)
+            client = DefenderClient(authenticator, verbose_level=verbose)
 
             # Create appropriate service based on endpoint
-            service = VulnerabilitiesService(client)
+            service = VulnerabilitiesService(client, verbose_level=verbose)
 
             # Create Nagios plugin
             plugin = NagiosPlugin(service)
