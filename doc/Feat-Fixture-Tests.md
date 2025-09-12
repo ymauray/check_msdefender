@@ -23,3 +23,18 @@ pytest tests/fixtures/
 ```
 
 ## Implementation
+
+### Test Structure
+- Direct service testing without mocks
+- JSON fixture data for predictable inputs
+- Validation of service outputs and error handling
+
+### Checklist
+- [ ] Create test fixtures in `tests/fixtures/`
+- [ ] Test `lastseen_service.py` functionality
+- [ ] Test `onboarding_service.py` functionality  
+- [ ] Test `vulnerabilities_service.py` functionality
+- [ ] Validate error handling for invalid inputs
+- [ ] Verify service integration with Microsoft Defender API
+- [ ] Add fixture data files for test scenarios
+- [ ] Document test coverage and expected behaviors
