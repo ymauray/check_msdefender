@@ -178,24 +178,60 @@ timeout = 5
 Add the following to your Nagios commands configuration:
 
 ```cfg
+#
+# check_msdefender
+#
+
+# /usr/local/libexec/nagios/check_msdefender/bin/check_msdefender
+
 define command {
-    command_name    check_msdefender
-    command_line    $USER1$/check_msdefender.py -c $ARG1$ -W $ARG3$ -C $ARG4$ vulnertabilities $HOSTNAME$
+    command_name    check_defender_vulnerabilities
+    command_line    $USER1$/check_msdefender/bin/check_msdefender vulnerabilities -d $HOSTALIAS$ 
+}
+
+define command {
+    command_name    check_defender_lastseen
+    command_line    $USER1$/check_msdefender/bin/check_msdefender lastseen -d $HOSTALIAS$ 
+}
+
+define command {
+    command_name    check_defender_onboarding
+    command_line    $USER1$/check_msdefender/bin/check_msdefender onboarding -d $HOSTALIAS$ 
 }
 ```
 
 ### Service definition examples:
 
 ```cfg
+#
+# svc-msdefender
+#
+
 define service {
-    use                 generic-service
-    host_name           msdefender_vulnertabilities
-    service_description Microsoft Defender Vulnerabilites
-    check_command       check_msdefender_vulnertabilities
+    use                     generic-service
+    service_description     DEFENDER_ONBOARDING
+    check_command           check_defender_onboarding
+    hostgroup_name          msdefender
+}
+
+define service {
+    use                     generic-service
+    service_description     DEFENDER_LASTSEEN
+    check_command           check_defender_lastseen
+    hostgroup_name          msdefender
+}
+
+define service {
+    use                     generic-service
+    service_description     DEFENDER_VULNERABILITIES
+    check_command           check_defender_vulnerabilities
+    hostgroup_name          msdefender
 }
 ```
 
 ## Microsoft Defender API Setup
+
+https://learn.microsoft.com/en-us/defender-endpoint/api/api-hello-world
 
 1. Register an application in Azure Active Directory
 2. Grant necessary Graph API permissions
@@ -203,8 +239,11 @@ define service {
 4. Note down the client ID, tenant ID, and authentication credentials
 
 Required API permissions (minimum):
-- `User.Read.All` (for user-related queries)
-- `Organization.Read.All` (for organization queries)
+
+WindowsDefenderATP (3)
+Machine.Read.All
+Vulnerability.Read
+Vulnerability.Read.All
 
 ## Architecture
 
