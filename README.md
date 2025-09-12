@@ -12,7 +12,7 @@ A Nagios plugin for monitoring Microsoft Defender API endpoints and checking val
 - Support for Client Certificate authentication
 - Configuration file for authentication credentials
 - Built using the nagiosplugin library
-- Uses Microsoft Graph SDK for Python (azure-identity)
+- Uses Microsoft Identity SDK for Python (azure-identity)
 
 ## Requirements
 
@@ -23,23 +23,12 @@ A Nagios plugin for monitoring Microsoft Defender API endpoints and checking val
 
 ## Installation
 
-### Method 1: Install from PyPI (Recommended)
+### Method 1: Install from source (Recommended)
 
 ```bash
-pip install check-msdefender
-```
-
-### Method 2: Install from Source
-
-1. Clone this repository:
-```bash
-git clone https://github.com/lduchosal/check_msdefender.git
-cd check_msdefender
-```
-
-2. Install the package:
-```bash
-pip install .
+virtualenv /usr/local/libexec/nagios/check_msdefender
+source /usr/local/libexec/nagios/check_msdefender/bin/activate.csh
+pip install git+https://github.com/lduchosal/check_msdefender.git
 ```
 
 For development installation:
@@ -50,7 +39,7 @@ pip install -r requirements-dev.txt
 
 ### Post-Installation Setup
 
-Create the default configuration file `check_msdefender.ini` in your current directory or Nagios base directory (typically `/usr/local/nagios/etc/`).
+Create the default configuration file `check_msdefender.ini` in Nagios base directory (typically `/usr/local/etc/nagios`).
 
 ## Authentication
 
@@ -91,12 +80,6 @@ Or run it as a Python module:
 
 ```bash
 python -m check_msdefender [options]
-```
-
-For manual/legacy installations:
-
-```bash
-./check_msdefender.py [options]
 ```
 
 The plugin will automatically look for the configuration file `check_msdefender.ini` in the current directory or Nagios base directory. You can override this with the `-c` option:
@@ -142,7 +125,6 @@ check_msdefender lastseen -d "machine.domain.tld" -W 7 -C 30
 
 # Check vulnerabilities, critical if > 1 critical vulnerability, warning if > 1 high vulnerability
 check_msdefender vulnerabilities -d "machine.domain.tld" -W 10 -C 100
-
 ```
 
 ### Supported Endpoints
@@ -248,16 +230,6 @@ Vulnerability.Read.All
 ## Architecture
 
 This plugin follows clean architecture principles:
-
-### Design Principles
-- **KISS (Keep It Simple, Stupid)**: Simple, focused components with clear responsibilities
-- **TDD (Test-Driven Development)**: Comprehensive test coverage with unit and integration tests
-- **SOLID Principles**:
-  - Single Responsibility: Each class has one reason to change
-  - Open/Closed: Open for extension, closed for modification
-  - Liskov Substitution: Implementations are substitutable
-  - Interface Segregation: Small, focused interfaces
-  - Dependency Inversion: Depend on abstractions, not concretions
 
 ### Package Structure
 
@@ -376,8 +348,16 @@ python -m twine upload dist/*
 
 - **Authentication Errors**: Ensure your Azure application has the required Graph API permissions
 - **Configuration Issues**: Check that your authentication credentials are correct in the config file
-- **Network Connectivity**: Verify connectivity to `graph.microsoft.com`
 - **Import Errors**: Make sure all dependencies are installed correctly
+- **Network Connectivity**: Verify connectivity (firewall) to 
+```
+api-eu.securitycenter.microsoft.com
+api-eu3.securitycenter.microsoft.com
+api.securitycenter.microsoft.com
+api-uk.securitycenter.microsoft.com
+
+login.microsoftonline.com
+```
 
 ### Debug Mode
 
