@@ -1,6 +1,6 @@
 > Fix exit value of process so it matches what is expected by nagios:
   Current Status:  OK  
-  Status Information:    UNKNOWN: [Errno 13] Permission denied: '/usr/local/nagios/etc/check_msdefender.ini'
+  Status Information:    UNKNOWN: [Errno 13] Permission denied: '/usr/local/etc/nagios/check_msdefender.ini'
 
 
 

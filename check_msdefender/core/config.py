@@ -31,7 +31,7 @@ def _find_config_file(config_path):
         return str(current_dir)
     
     # Try Nagios base directory
-    nagios_base = Path('/usr/local/nagios/etc') / config_path
+    nagios_base = Path('/usr/local/etc/nagios') / config_path
     if nagios_base.exists():
         return str(nagios_base)
     

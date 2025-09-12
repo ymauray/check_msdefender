@@ -353,7 +353,7 @@ check_msdefender vulnerabilities -v -v -v
 Review Nagios logs for detailed error messages:
 
 ```bash
-tail -f /usr/local/nagios/var/nagios.log
+tail -f /var/logs/nagios/nagios.log
 ```
 
 ## Contributing
