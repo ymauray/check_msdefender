@@ -1,5 +1,6 @@
 """Last seen service implementation."""
 
+import re
 from datetime import datetime
 from check_msdefender.core.exceptions import ValidationError
 from check_msdefender.core.logging_config import get_verbose_logger
@@ -39,7 +40,12 @@ class LastSeenService:
         
         # Parse timestamp and calculate days difference
         try:
-            last_seen = datetime.fromisoformat(last_seen_str.replace('Z', '+00:00'))
+            # Handle high-precision microseconds by truncating to 6 digits
+            timestamp_str = last_seen_str.replace('Z', '+00:00')
+            # Regex to find and truncate microseconds longer than 6 digits
+            timestamp_str = re.sub(r'\.(\d{6})\d+', r'.\1', timestamp_str)
+            
+            last_seen = datetime.fromisoformat(timestamp_str)
             now = datetime.now(last_seen.tzinfo)
             days_diff = (now - last_seen).days
             

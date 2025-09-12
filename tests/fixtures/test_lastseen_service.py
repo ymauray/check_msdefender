@@ -80,3 +80,19 @@ class TestLastSeenServiceFixtures:
         
         with pytest.raises(ValidationError, match="Invalid lastSeen timestamp"):
             service.get_value(machine_id="test-machine")
+    
+    def test_get_value_high_precision_microseconds_regression(self):
+        """Test parsing timestamp with high precision microseconds - regression test."""
+        import re
+        
+        # Create a mock client that returns timestamp with 7-digit microseconds
+        class MockClientHighPrecision:
+            def get_machine_by_id(self, machine_id):
+                return {"id": machine_id, "lastSeen": "2025-09-12T13:14:52.3321473Z"}
+        
+        service = LastSeenService(MockClientHighPrecision())
+        
+        # Test that it works with the current implementation (might truncate microseconds)
+        result = service.get_value(machine_id="test-machine")
+        # Should return a reasonable value (depends on current time)
+        assert isinstance(result, int)
