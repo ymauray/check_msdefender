@@ -2,23 +2,22 @@
 
 import click
 
-from core import config
 from core.auth import get_authenticator
 from core.config import load_config
 from core.defender import DefenderClient
 from core.nagios import NagiosPlugin
-from services.last_seen_service import LastSeenService
+from services.lastseen_service import LastSeenService
 from ..decorators import common_options
 
 @click.group()
-def last_seen():
+def lastseen():
     """Check last seen for Microsoft Defender."""
     pass
 
-@last_seen.command()
+@lastseen.command()
 @common_options
 @click.pass_context
-def last_seen_cmd(ctx, machine_id, dns_name, warning, critical):
+def lastseen_cmd(ctx, config, verbose, machine_id, dns_name, warning, critical):
     """Check days since last seen for Microsoft Defender."""
     warning = warning if warning is not None else 7
     critical = critical if critical is not None else 30
@@ -33,7 +32,7 @@ def last_seen_cmd(ctx, machine_id, dns_name, warning, critical):
         # Create Defender client
         client = DefenderClient(authenticator)
 
-        # Create appropriate service based on endpoint
+        # Create the appropriate service based on service
         service = LastSeenService(client)
 
         # Create Nagios plugin

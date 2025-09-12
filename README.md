@@ -110,27 +110,38 @@ check_msdefender -c /path/to/custom/config.ini [options]
 - `-c, --config`: Configuration file path (optional, defaults to check_msdefender.ini in current or Nagios base directory)
 - `-m, --machineId`: Machine Identified (GUID)
 - `-d, --computerDnsName`:  Computer DNS Name (FQDN)
-- `-e, --endpoint`: Defender API endpoint (required)
 - `-W, --warning`: Warning threshold (numeric value)
 - `-C, --critical`: Critical threshold (numeric value) 
 - `-v, --verbose`: Increase verbosity (use -v, -vv, or -vvv)
 - `-h, --help`: Show help message
 - `--version`: Show version information
+- Defender API endpoint (required)
 
 ### Examples
 
 ```bash
 # Check onboardingStatus (using default config)
-check_msdefender -d "machine.domain.tld" -e onboardingStatus -W 1 -C 2
+check_msdefender onboarding -d machine.domain.tld
 
+# Check lastSeen
+check_msdefender lastseen -d machine.domain.tld
+
+# Check vulnerabilities
+check_msdefender vulnerabilities -d machine.domain.tld
+```
+
+
+### Custom examples
+
+```bash
 # Check onboardingStatus (using  custom config)
-check_msdefender -c /path/to/check_msdefender.ini -d "machine.domain.tld" -e onboardingStatus -W 1 -C 2
+check_msdefender onboarding -c /path/to/check_msdefender.ini -d "machine.domain.tld" -W 1 -C 2
 
 # Check lastSeen, warning if > 1 week, critical if > 1 month
-check_msdefender -d "machine.domain.tld" -e lastSeen -W 7 -C 30
+check_msdefender lastseen -d "machine.domain.tld" -W 7 -C 30
 
 # Check vulnerabilities, critical if > 1 critical vulnerability, warning if > 1 high vulnerability
-check_msdefender -d "machine.domain.tld" -e vulnerabilities -W 10 -C 100
+check_msdefender vulnerabilities -d "machine.domain.tld" -W 10 -C 100
 
 ```
 
@@ -169,16 +180,7 @@ Add the following to your Nagios commands configuration:
 ```cfg
 define command {
     command_name    check_msdefender
-    command_line    check_msdefender -c $ARG1$ -e $ARG2$ -W $ARG3$ -C $ARG4$
-}
-```
-
-### For manual installation:
-
-```cfg
-define command {
-    command_name    check_msdefender
-    command_line    $USER1$/check_msdefender.py -c $ARG1$ -e $ARG2$ -W $ARG3$ -C $ARG4$
+    command_line    $USER1$/check_msdefender.py -c $ARG1$ -W $ARG3$ -C $ARG4$ vulnertabilities $HOSTNAME$
 }
 ```
 
@@ -187,16 +189,9 @@ define command {
 ```cfg
 define service {
     use                 generic-service
-    host_name           msdefender-monitor
-    service_description Microsoft Graph User Count
-    check_command       check_msdefender!/etc/nagios/msdefender.ini!users/$count!100!200
-}
-
-define service {
-    use                 generic-service
-    host_name           msdefender-monitor
-    service_description Microsoft Graph Group Count
-    check_command       check_msdefender!/etc/nagios/msdefender.ini!groups/$count!50!100
+    host_name           msdefender_vulnertabilities
+    service_description Microsoft Defender Vulnerabilites
+    check_command       check_msdefender_vulnertabilities
 }
 ```
 
@@ -350,7 +345,7 @@ python -m twine upload dist/*
 Run with verbose output for troubleshooting:
 
 ```bash
-check_msdefender -e "users/$count" -v -v -v
+check_msdefender vulnerabilities -v -v -v
 ```
 
 ### Log Analysis
