@@ -1,5 +1,6 @@
 """Nagios plugin implementation."""
 
+import sys
 import nagiosplugin
 
 
@@ -31,7 +32,7 @@ class NagiosPlugin:
             
         except Exception as e:
             print(f"UNKNOWN: {str(e)}")
-            return 3
+            sys.exit(3)
 
 
 class DefenderResource(nagiosplugin.Resource):

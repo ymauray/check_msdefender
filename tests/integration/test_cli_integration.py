@@ -103,8 +103,8 @@ class TestLastSeenCommand:
         
         result = cli_runner.invoke(main, ['lastseen', '-d', 'machine.domain.tld'])
         
-        # Exit code should be 0 but output contains error
-        assert result.exit_code == 0
+        # Exit code should be 3 for UNKNOWN error
+        assert result.exit_code == 3
         assert "UNKNOWN: Configuration error" in result.output
 
 
@@ -147,7 +147,7 @@ class TestOnboardingCommand:
         
         result = cli_runner.invoke(main, ['onboarding', '-d', 'machine.domain.tld'])
         
-        assert result.exit_code == 0
+        assert result.exit_code == 3
         assert "UNKNOWN: Authentication failed" in result.output
 
 
@@ -248,5 +248,5 @@ class TestVulnerabilitiesCommand:
         
         result = cli_runner.invoke(main, ['vulnerabilities', '-d', 'machine.domain.tld'])
         
-        assert result.exit_code == 0
+        assert result.exit_code == 3
         assert "UNKNOWN: Service unavailable" in result.output

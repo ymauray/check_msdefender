@@ -8,7 +8,8 @@
       "Bash(pip install:*)",
       "Bash(pytest:*)",
       "Bash(python:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(echo \"Exit code: $?\")"
     ],
     "deny": [],
     "ask": []

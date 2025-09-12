@@ -76,5 +76,5 @@ def test_lastseen_command_exception(mock_config, cli_runner, mock_app):
     ])
     
     # Verify error handling
-    assert result.exit_code == 0  # Function returns 3 but click doesn't propagate it
+    assert result.exit_code == 3  # Now properly returns exit code 3 for UNKNOWN
     assert "UNKNOWN: Test error" in result.output

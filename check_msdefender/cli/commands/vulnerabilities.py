@@ -1,5 +1,6 @@
 """Vulnerability commands for CLI."""
 
+import sys
 import click
 
 from check_msdefender.core.auth import get_authenticator
@@ -45,8 +46,8 @@ def register_vulnerability_commands(main_group):
                 verbose=verbose
             )
 
-            return result
+            sys.exit(result or 0)
 
         except Exception as e:
             print(f"UNKNOWN: {str(e)}")
-            return 3
+            sys.exit(3)
