@@ -2,11 +2,11 @@
 
 import click
 
-from core.auth import get_authenticator
-from core.config import load_config
-from core.defender import DefenderClient
-from core.nagios import NagiosPlugin
-from services.vulnerabilities_service import VulnerabilitiesService
+from check_msdefender.core.auth import get_authenticator
+from check_msdefender.core.config import load_config
+from check_msdefender.core.defender import DefenderClient
+from check_msdefender.core.nagios import NagiosPlugin
+from check_msdefender.services.vulnerabilities_service import VulnerabilitiesService
 from ..decorators import common_options
 
 @click.group()
@@ -17,7 +17,7 @@ def vulnerabilities():
 @vulnerabilities.command()
 @common_options
 @click.pass_context
-def vulnerabilities_cmd(ctx, config, verbose, machine_id, dns_name, warning, critical):
+def vulnerabilities_cmd(config, verbose, machine_id, dns_name, warning, critical):
     """Check vulnerability score for Microsoft Defender."""
     warning = warning if warning is not None else 10
     critical = critical if critical is not None else 100

@@ -31,13 +31,7 @@ The main command should serve as a Click group with common global options:
 
 **Primary command:**
 ```bash
-check_msdefender last-seen [OPTIONS] MACHINE
-```
-
-**Aliases:**
-```bash
-check_msdefender last [OPTIONS] MACHINE
-check_msdefender ls [OPTIONS] MACHINE
+check_msdefender lastseen [OPTIONS] MACHINE
 ```
 
 **Options:**
@@ -48,22 +42,16 @@ check_msdefender ls [OPTIONS] MACHINE
 
 **Examples:**
 ```bash
-check_msdefender last-seen --dns-name machine.domain.tld
-check_msdefender last -d machine.domain.tld -W 3 -C 7
-check_msdefender ls --machine-id "12345678-1234-1234-1234-123456789012"
+check_msdefender lastseen --dns-name machine.domain.tld
+check_msdefender lastseen -d machine.domain.tld -W 3 -C 7
+check_msdefender lastseen --machine-id "12345678-1234-1234-1234-123456789012"
 ```
 
 #### 2. Onboarding Status Command
 
 **Primary command:**
 ```bash
-check_msdefender onboarding-status [OPTIONS] MACHINE
-```
-
-**Aliases:**
-```bash
 check_msdefender onboarding [OPTIONS] MACHINE
-check_msdefender status [OPTIONS] MACHINE
 ```
 
 **Options:**
@@ -74,9 +62,8 @@ check_msdefender status [OPTIONS] MACHINE
 
 **Examples:**
 ```bash
-check_msdefender onboarding-status --dns-name machine.domain.tld
 check_msdefender onboarding -d machine.domain.tld
-check_msdefender status --machine-id "12345678-1234-1234-1234-123456789012"
+check_msdefender onboarding --machine-id "12345678-1234-1234-1234-123456789012"
 ```
 
 #### 3. Vulnerabilities Command
@@ -85,13 +72,6 @@ check_msdefender status --machine-id "12345678-1234-1234-1234-123456789012"
 ```bash
 check_msdefender vulnerabilities [OPTIONS] MACHINE
 ```
-
-**Aliases:**
-```bash
-check_msdefender vuln [OPTIONS] MACHINE
-check_msdefender vulns [OPTIONS] MACHINE
-```
-
 **Options:**
 - `--machine-id/-m`: Machine ID (GUID)
 - `--dns-name/-d`: Computer DNS Name (FQDN)
@@ -101,8 +81,8 @@ check_msdefender vulns [OPTIONS] MACHINE
 **Examples:**
 ```bash
 check_msdefender vulnerabilities --dns-name machine.domain.tld
-check_msdefender vuln -d machine.domain.tld -W 5 -C 50
-check_msdefender vulns --machine-id "12345678-1234-1234-1234-123456789012"
+check_msdefender vulnerabilities -d machine.domain.tld -W 5 -C 50
+check_msdefender vulnerabilities --machine-id "12345678-1234-1234-1234-123456789012"
 ```
 
 ## Implementation Requirements

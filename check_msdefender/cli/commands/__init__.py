@@ -1,11 +1,11 @@
 """Commands package for CLI."""
 
-from cli.commands.last_seen import last_seen
-from cli.commands.vulnerabilities import vulnerabilities
-from cli.commands.onboarding import onboarding_status
+from .lastseen import lastseen
+from .vulnerabilities import vulnerabilities
+from .onboarding import onboarding
 
-def register_all_commands(cli):
+def register_all_commands(main_group):
     """Register all command groups with the main CLI group."""
-    cli.add_command(last_seen)
-    cli.add_command(vulnerabilities)
-    cli.add_command(onboarding_status)
+    main_group.add_command(lastseen)
+    main_group.add_command(vulnerabilities)
+    main_group.add_command(onboarding)

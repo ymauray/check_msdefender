@@ -2,11 +2,11 @@
 
 import click
 
-from core.auth import get_authenticator
-from core.config import load_config
-from core.defender import DefenderClient
-from core.nagios import NagiosPlugin
-from services.onboarding_status_service import OnboardingStatusService
+from check_msdefender.core.auth import get_authenticator
+from check_msdefender.core.config import load_config
+from check_msdefender.core.defender import DefenderClient
+from check_msdefender.core.nagios import NagiosPlugin
+from check_msdefender.services.onboarding_service import OnboardingService
 from ..decorators import common_options
 
 @click.group()
@@ -17,7 +17,7 @@ def onboarding():
 @onboarding.command()
 @common_options
 @click.pass_context
-def onboarding_cmd(ctx, config, verbose, machine_id, dns_name, warning, critical):
+def onboarding_cmd(config, verbose, machine_id, dns_name, warning, critical):
     """Check onboarding status for Microsoft Defender (alias for onboarding-status)."""
     warning = warning if warning is not None else 1
     critical = critical if critical is not None else 2
@@ -33,7 +33,7 @@ def onboarding_cmd(ctx, config, verbose, machine_id, dns_name, warning, critical
         client = DefenderClient(authenticator)
 
         # Create the appropriate service based on service
-        service = OnboardingStatusService(client)
+        service = OnboardingService(client)
 
         # Create Nagios plugin
         plugin = NagiosPlugin(service)

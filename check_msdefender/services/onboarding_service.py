@@ -4,7 +4,7 @@ from check_msdefender.services.models import OnboardingStatus
 from check_msdefender.core.exceptions import ValidationError
 
 
-class OnboardingStatusService:
+class OnboardingService:
     """Service for checking onboarding status."""
     
     def __init__(self, defender_client):
