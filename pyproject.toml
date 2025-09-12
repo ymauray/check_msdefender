@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "check-msdefender"
+version = "1.0.0"
+authors = [
+    {name = "ldvchosal", email = "ldvchosal@github.com"},
+]
+description = "A Nagios plugin for monitoring Microsoft Defender API endpoints"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.6"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: System :: Monitoring",
+    "Topic :: System :: Systems Administration",
+]
+keywords = ["nagios", "monitoring", "microsoft", "graph", "api", "azure"]
+dependencies = [
+    "nagiosplugin>=1.4.0",
+    "azure-identity>=1.12.0",
+    "click>=8.2.2"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "pytest-asyncio>=1.0",
+    "black>=21.0",
+    "flake8>=3.8",
+    "mypy>=0.800",
+]
+
+[project.urls]
+Homepage = "https://github.com/lduchosal/check_msdefender"
+"Bug Reports" = "https://github.com/lduchosal/check_msdefender/issues"
+Source = "https://github.com/lduchosal/check_msdefender"
+Documentation = "https://github.com/lduchosal/check_msdefender/blob/main/README.md"
+
+[project.scripts]
+check_msdefender = "check_msdefender.check_msdefender:main"
+
+[tool.setuptools.package-data]
+"*" = ["*.ini"]
+
+[tool.black]
+line-length = 100
+target-version = ['py36']
+
+[tool.mypy]
+python_version = "3.6"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --cov=src --cov-report=term-missing"

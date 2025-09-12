@@ -1,0 +1,18 @@
+[auth]
+# Required for both authentication methods
+client_id = your-application-client-id
+tenant_id = your-azure-tenant-id
+
+# For Client Secret authentication
+client_secret = your-client-secret
+
+# For Client Certificate authentication (alternative to client_secret)
+# certificate_path = /path/to/certificate.pem
+# private_key_path = /path/to/private_key.pem
+
+[settings]
+# Optional: API version (default: v1.0)
+api_version = v1.0
+
+# Optional: Timeout in seconds (default: 30)
+timeout = 30

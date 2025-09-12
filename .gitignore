@@ -1,0 +1,5 @@
+﻿/build/
+/check_msdefender.egg-info/
+/dist/
+/.env
+/check_msdefender.ini
