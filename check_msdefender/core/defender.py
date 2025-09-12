@@ -5,8 +5,6 @@ import requests
 from check_msdefender.core.exceptions import DefenderAPIError
 from check_msdefender.core.logging_config import get_verbose_logger
 
-
-
 class DefenderClient:
     """Client for Microsoft Defender API."""
     application_json = 'application/json'
@@ -68,38 +66,39 @@ class DefenderClient:
             return result
         except requests.RequestException as e:
             self.logger.debug(f"API request failed: {str(e)}")
+            self.logger.debug(f"Response: {str(e.response.content)}")
             raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
-    
+
     def get_machine_by_id(self, machine_id):
         """Get machine information by machine ID."""
         self.logger.method_entry("get_machine_by_id", machine_id=machine_id)
-        
+
         token = self._get_token()
-        
+
         url = f"{self.base_url}/api/machines/{machine_id}"
         headers = {
             'Authorization': f'Bearer {token}',
             'Content-Type': DefenderClient.application_json
         }
-        
+
         try:
             start_time = time.time()
             self.logger.info(f"Querying machine by ID: {machine_id}")
             response = requests.get(url, headers=headers, timeout=self.timeout)
             elapsed = time.time() - start_time
-            
+
             self.logger.api_call("GET", url, response.status_code, elapsed)
             response.raise_for_status()
-            
+
             result = response.json()
             self.logger.json_response(str(result))
             self.logger.method_exit("get_machine_by_id", result)
             return result
         except requests.RequestException as e:
             self.logger.debug(f"API request failed: {str(e)}")
-            self.logger.debug(f"Response: {str(e.Response)}")
+            self.logger.debug(f"Response: {str(e.response.content)}")
             raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
-    
+
     def get_machine_vulnerabilities(self, machine_id):
         """Get vulnerabilities for a machine."""
         self.logger.method_entry("get_machine_vulnerabilities", machine_id=machine_id)
@@ -127,13 +126,13 @@ class DefenderClient:
             return result
         except requests.RequestException as e:
             self.logger.debug(f"API request failed: {str(e)}")
-            self.logger.debug(f"Response: {str(e.Response)}")
+            self.logger.debug(f"Response: {str(e.response.content)}")
             raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
     
     def _get_token(self):
         """Get access token from authenticator."""
         self.logger.trace("Getting access token from authenticator")
-        scope = "https://graph.microsoft.com/.default"
+        scope = "https://api.securitycenter.microsoft.com/.default"
         token = self.authenticator.get_token(scope)
         self.logger.trace(f"Token acquired successfully (expires: {token.expires_on})")
         return token.token

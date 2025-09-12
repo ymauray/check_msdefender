@@ -10,7 +10,7 @@ class LastSeenService:
     
     def __init__(self, defender_client, verbose_level=0):
         """Initialize with Defender client."""
-        self.client = defender_client
+        self.defender = defender_client
         self.logger = get_verbose_logger(__name__, verbose_level)
     
     def get_value(self, machine_id=None, dns_name=None):
@@ -21,19 +21,17 @@ class LastSeenService:
             raise ValidationError("Either machine_id or dns_name must be provided")
         
         # Get machine information
-        if machine_id:
-            self.logger.info(f"Fetching machine data by ID: {machine_id}")
-            machine_data = self.client.get_machine_by_id(machine_id)
-        else:
+        if dns_name:
             self.logger.info(f"Fetching machine data by DNS name: {dns_name}")
-            machines_data = self.client.get_machine_by_dns_name(dns_name)
+            machines_data = self.defender.get_machine_by_dns_name(dns_name)
             if not machines_data.get('value'):
                 raise ValidationError(f"Machine not found with DNS name: {dns_name}")
             machine_data = machines_data['value'][0]
             self.logger.debug(f"Found machine: {machine_data.get('id', 'unknown')}")
+            machine_id = machine_data.get('id')
         
         # Extract last seen timestamp
-        last_seen_str = machine_data.get('lastSeen')
+        last_seen_str = self.defender.get_machine_by_id(machine_id)['lastSeen']
         if not last_seen_str:
             raise ValidationError("No lastSeen data available for machine")
         
