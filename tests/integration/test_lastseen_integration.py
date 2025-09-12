@@ -53,6 +53,7 @@ def test_lastseen_command_success(mock_nagios, mock_service, mock_client,
     
     # Verify result
     assert result.exit_code == 0
+    mock_nagios.assert_called_once_with(mock_service_instance, 'lastseen')
     mock_plugin.check.assert_called_once_with(
         machine_id='test-machine-id',
         dns_name=None,

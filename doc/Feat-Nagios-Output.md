@@ -1,20 +1,53 @@
-# Nagios plugin
+# Nagios Plugin Output Format
 
-nagios plugin output is not precise enough.
-Use DEFENDER instead of NAGIOSRESOURCE
-Use command name instead of value
+## Technical Requirements
 
-## Correct output
-### lastseen
-check_msdefender % check_msdefender lastseen -d machine.domain.tld
-Actual : NAGIOSRESOURCE OK - value is 0 | value=0;7;30
-Correct : DEFENDER OK - lastseen is 0 | value=0;7;30
+The Nagios plugin output follows the standard format:
+```
+SERVICE_NAME STATUS - message | performance_data
+```
 
-### onboarding
+**Current Issues:**
+- Generic "NAGIOSRESOURCE" service name lacks specificity
+- "value" in message provides no context about what's being measured
+
+**Solution:**
+- Use "DEFENDER" as service name for better identification
+- Replace "value" with specific command name (lastseen, onboarding, vulnerabilities)
+
+## Performance Data Format
+`metric=value;warning;critical;min;max`
+
+## Output Examples
+
+### lastseen Command
+```bash
+check_msdefender lastseen -d machine.domain.tld
+```
+- **Before:** `NAGIOSRESOURCE OK - value is 0 | value=0;7;30`
+- **After:** `DEFENDER OK - lastseen is 0 | lastseen=0;7;30`
+
+**Thresholds:** Warning=7 days, Critical=30 days
+
+### onboarding Command
+```bash
 check_msdefender onboarding -d machine.domain.tld
-Actual : NAGIOSRESOURCE WARNING - value is 2 (outside range 0:1) | value=2;1;2
-Correct : DEFENDER WARNING - onboarding is 2 (outside range 0:1) | value=2;1;2
+```
+- **Before:** `NAGIOSRESOURCE WARNING - value is 2 (outside range 0:1) | value=2;1;2`
+- **After:** `DEFENDER WARNING - onboarding is 2 (outside range 0:1) | onboarding=2;1;2`
 
-### vulnerabilities
-check_msdefender vulnerabilities -d machine.domain.tld    
-DEFENDER CRITICAL - vulnerabilities is 294 (outside range 0:100) | value=294;10;100
+**Expected Values:** 0=onboarded, 1=pending, 2=failed
+
+### vulnerabilities Command
+```bash
+check_msdefender vulnerabilities -d machine.domain.tld
+```
+- **Output:** `NAGIOSRESOURCE CRITICAL - value is 294 (outside range 0:100) | value=294;10;100`
+- **After:** `DEFENDER CRITICAL - vulnerabilities is 294 (outside range 0:100) | vulnerabilities=294;10;100`
+
+**Thresholds:** Warning=10, Critical=100
+
+## Implementation Notes
+- Exit codes follow Nagios standards: OK=0, WARNING=1, CRITICAL=2, UNKNOWN=3
+- Performance data enables trending and graphing in monitoring systems
+- Service name "DEFENDER" improves alerting clarity and filtering

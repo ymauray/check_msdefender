@@ -34,7 +34,7 @@ def register_vulnerability_commands(main_group):
             service = VulnerabilitiesService(client, verbose_level=verbose)
 
             # Create Nagios plugin
-            plugin = NagiosPlugin(service)
+            plugin = NagiosPlugin(service, 'vulnerabilities')
 
             # Execute check
             result = plugin.check(

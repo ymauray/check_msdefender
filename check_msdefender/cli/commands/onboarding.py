@@ -34,7 +34,7 @@ def register_onboarding_commands(main_group):
             service = OnboardingService(client, verbose_level=verbose)
 
             # Create Nagios plugin
-            plugin = NagiosPlugin(service)
+            plugin = NagiosPlugin(service, 'onboarding')
 
             # Execute check
             result = plugin.check(

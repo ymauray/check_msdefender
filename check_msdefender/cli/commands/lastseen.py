@@ -34,7 +34,7 @@ def register_lastseen_commands(main_group):
             service = LastSeenService(client, verbose_level=verbose)
 
             # Create Nagios plugin
-            plugin = NagiosPlugin(service)
+            plugin = NagiosPlugin(service, 'lastseen')
 
             # Execute check
             result = plugin.check(
