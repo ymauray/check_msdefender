@@ -31,7 +31,7 @@ keywords = ["nagios", "monitoring", "microsoft", "graph", "api", "azure"]
 dependencies = [
     "nagiosplugin>=1.4.0",
     "azure-identity>=1.12.0",
-    "click>=8.2.2"
+    "click>=8.2.1"
 ]
 
 [project.optional-dependencies]
@@ -51,7 +51,11 @@ Source = "https://github.com/lduchosal/check_msdefender"
 Documentation = "https://github.com/lduchosal/check_msdefender/blob/main/README.md"
 
 [project.scripts]
-check_msdefender = "check_msdefender.check_msdefender:main"
+check_msdefender = "check_msdefender.cli:main"
+check-msdefender-legacy = "check_msdefender.cli:legacy_main"
+check-msdefender-onboarding = "check_msdefender.cli.onboarding_status:main"
+check-msdefender-lastseen = "check_msdefender.cli.last_seen:main"
+check-msdefender-vulnerabilities = "check_msdefender.cli.vulnerabilities:main"
 
 [tool.setuptools.package-data]
 "*" = ["*.ini"]

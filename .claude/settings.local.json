@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(python -m check_msdefender:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
