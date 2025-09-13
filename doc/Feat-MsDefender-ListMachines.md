@@ -1,30 +1,87 @@
-# List machines
+# List Machines Feature
 
-List machine in ms defender
+List all machines in Microsoft Defender for Endpoint.
 
-https://api.securitycenter.microsoft.com/api/machines?$select=id,computerDnsName,version,exposureLevel,onboardingStatus,riskScore,isExcluded,lastSeen,healthStatus,isAadJoined,osPlatform
+## API Endpoint
 
-## Base Url
-https://api.securitycenter.microsoft.com
+**Base URL:** `https://api.securitycenter.microsoft.com`
+**Path:** `/api/machines`
+**Method:** `GET`
 
-## Url
-/api/machines
+### Query Parameters
+- `$select`: Fields to include in response
+  - Required: `id,computerDnsName,onboardingStatus,osPlatform`
+  - Optional: `version,exposureLevel,riskScore,isExcluded,lastSeen,healthStatus,isAadJoined`
 
-## Select
-$select=id,computerDnsName,onboardingStatus,osPlatform
+### Authentication
+- Azure AD OAuth 2.0 with Microsoft Defender ATP API permissions
+- Token scope: `https://api.securitycenter.microsoft.com/.default`
 
-## Cli
+## CLI Implementation
 
-check_msdefender listmachines -W 10 -C 25 
-DEFENDER OK - listmachines is 4 | listmachines=0;10;25
+### Command Structure
+```bash
+check_msdefender listmachines [OPTIONS]
+```
+
+### Options
+- `-W, --warning <count>`: Warning threshold for machine count (default: 10)
+- `-C, --critical <count>`: Critical threshold for machine count (default: 25)
+- `--timeout <seconds>`: API request timeout (default: 30)
+- `--format <format>`: Output format: nagios, json, table (default: nagios)
+
+### Example Usage
+```bash
+check_msdefender listmachines -W 10 -C 25
+```
+
+### Sample Output
+```
+DEFENDER OK - listmachines is 4 | listmachines=4;10;25
 88xxxxxxxx01 ma1.domain.tld Onboarded Windows11
 88xxxxxxxx02 ma2.domain.tld Onboarded Windows11
 88xxxxxxxx03 ma3.domain.tld Onboarded Windows11
 88xxxxxxxx04 ma4.domain.tld Onboarded Windows11
+```
 
-## Nagios
+## Nagios Integration
 
-Ok if count < <warning>
-Warning if count > <warning>
-Critical if count > <critical>
+### Exit Codes
+- **0 (OK)**: Machine count < warning threshold
+- **1 (WARNING)**: Machine count ≥ warning threshold and < critical threshold
+- **2 (CRITICAL)**: Machine count ≥ critical threshold
+- **3 (UNKNOWN)**: API error or authentication failure
+
+### Performance Data
+Format: `listmachines=<current>;<warning>;<critical>`
+
+### Output Format
+```
+DEFENDER <STATUS> - listmachines is <count> | listmachines=<count>;<warning>;<critical>
+<machine_details>
+```
+
+## Implementation Details
+
+### Cli 
+- cli : check_msdefender/cli/commands/listmachines.py
+  use lastseen.py as a template
+
+### Service 
+- service:  check_msdefender/services/listmachines_service.py
+  use lastseen_service.py as a template
+
+### Core 
+- core:  check_msdefender/core/defender.py
+  use existing methodes as a template
+  `list_machines()`: Retrieve machines from API
+
+
+## File Structure
+```
+check_msdefender/
+├── cli/commands/listmachines.py          # CLI command implementation
+├── services/listmachines_service.py      # Business logic service
+└── core/defender.py               # API client (get_machine_by_id exists)
+```
 
