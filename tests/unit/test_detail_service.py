@@ -21,7 +21,7 @@ class TestDetailService:
         assert self.service.defender == self.mock_client
         assert hasattr(self.service, 'logger')
 
-    def test_get_value_by_machine_id_success(self):
+    def test_get_result_by_machine_id_success(self):
         """Test successful retrieval by machine ID."""
         # Mock the API response
         mock_machine_data = {
@@ -32,10 +32,10 @@ class TestDetailService:
         }
         self.mock_client.get_machine_by_id.return_value = mock_machine_data
 
-        result = self.service.get_value(machine_id="test-machine-123")
+        result = self.service.get_result(machine_id="test-machine-123")
 
         # Should return 1 for found
-        assert result == 1
+        assert result["value"] == 1
 
         # Should call the client with correct machine ID
         self.mock_client.get_machine_by_id.assert_called_once_with("test-machine-123")
@@ -44,7 +44,7 @@ class TestDetailService:
         assert hasattr(self.service, '_machine_details')
         assert self.service._machine_details == mock_machine_data
 
-    def test_get_value_by_dns_name_success(self):
+    def test_get_result_by_dns_name_success(self):
         """Test successful retrieval by DNS name."""
         # Mock DNS lookup response
         mock_dns_response = {
@@ -58,46 +58,46 @@ class TestDetailService:
         self.mock_client.get_machine_by_dns_name.return_value = mock_dns_response
         self.mock_client.get_machine_by_id.return_value = mock_machine_data
 
-        result = self.service.get_value(dns_name="test.domain.com")
+        result = self.service.get_result(dns_name="test.domain.com")
 
         # Should return 1 for found
-        assert result == 1
+        assert result["value"] == 1
 
         # Should call both DNS lookup and machine ID retrieval
         self.mock_client.get_machine_by_dns_name.assert_called_once_with("test.domain.com")
         self.mock_client.get_machine_by_id.assert_called_once_with("test-machine-456")
 
-    def test_get_value_by_dns_name_not_found(self):
+    def test_get_result_by_dns_name_not_found(self):
         """Test DNS name not found."""
         # Mock empty DNS response
         mock_dns_response = {"value": []}
         self.mock_client.get_machine_by_dns_name.return_value = mock_dns_response
 
-        result = self.service.get_value(dns_name="nonexistent.domain.com")
+        result = self.service.get_result(dns_name="nonexistent.domain.com")
 
         # Should return 0 for not found
-        assert result == 0
+        assert result["value"] == 0
 
         # Should not call get_machine_by_id since DNS lookup failed
         self.mock_client.get_machine_by_dns_name.assert_called_once_with("nonexistent.domain.com")
         self.mock_client.get_machine_by_id.assert_not_called()
 
-    def test_get_value_no_parameters(self):
+    def test_get_result_no_parameters(self):
         """Test error when no parameters provided."""
         with pytest.raises(ValidationError, match="Either machine_id or dns_name must be provided"):
-            self.service.get_value()
+            self.service.get_result()
 
         # Should not make any API calls
         self.mock_client.get_machine_by_id.assert_not_called()
         self.mock_client.get_machine_by_dns_name.assert_not_called()
 
-    def test_get_value_api_exception_propagation(self):
+    def test_get_result_api_exception_propagation(self):
         """Test that API exceptions are propagated."""
         # Mock an exception from the client
         self.mock_client.get_machine_by_id.side_effect = Exception("API Error")
 
         with pytest.raises(Exception, match="API Error"):
-            self.service.get_value(machine_id="test-machine")
+            self.service.get_result(machine_id="test-machine")
 
     def test_get_machine_details_json_success(self):
         """Test JSON formatting of machine details."""
@@ -134,13 +134,17 @@ class TestDetailService:
         # Mock the logger
         self.service.logger = Mock()
 
-        self.service.get_value(machine_id="test-machine")
+        self.service.get_result(machine_id="test-machine")
 
         # Verify logging calls
         self.service.logger.method_entry.assert_called_once_with(
-            "get_value", machine_id="test-machine", dns_name=None
+            "get_result", machine_id="test-machine", dns_name=None
         )
-        self.service.logger.method_exit.assert_called_once_with("get_value", 1)
+        # get_result returns a dict, so method_exit gets the dict
+        assert self.service.logger.method_exit.call_count == 1
+        exit_call_args = self.service.logger.method_exit.call_args[0]
+        assert exit_call_args[0] == "get_result"
+        assert exit_call_args[1]['value'] == 1
 
     def test_dns_name_with_machine_id_precedence(self):
         """Test that DNS name resolution works when both parameters are provided."""
@@ -152,9 +156,9 @@ class TestDetailService:
         self.mock_client.get_machine_by_id.return_value = mock_machine_data
 
         # Call with both parameters - DNS name should be used first
-        result = self.service.get_value(machine_id="direct-machine", dns_name="test.domain.com")
+        result = self.service.get_result(machine_id="direct-machine", dns_name="test.domain.com")
 
-        assert result == 1
+        assert result["value"] == 1
         # Should resolve via DNS first
         self.mock_client.get_machine_by_dns_name.assert_called_once_with("test.domain.com")
         self.mock_client.get_machine_by_id.assert_called_once_with("dns-resolved-machine")

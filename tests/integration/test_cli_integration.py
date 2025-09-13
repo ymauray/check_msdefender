@@ -269,15 +269,19 @@ class TestDetailCommand:
         mock_client.return_value = Mock()
         mock_service_instance = Mock()
         mock_service.return_value = mock_service_instance
-        mock_service_instance.get_value.return_value = 1
+        mock_service_instance.get_result.return_value = 1
+        mock_service_instance.get_result.return_value = {
+            'value': 1,
+            'details': ['Machine ID: test-machine', 'Computer Name: test-pc']
+        }
         mock_service_instance.get_machine_details_json.return_value = '{"id": "test-machine"}'
 
         result = cli_runner.invoke(main, ['detail', '-i', 'test-machine-123'])
 
         assert result.exit_code == 0
-        assert "DEFENDER OK - Machine details retrieved" in result.output
+        assert "DEFENDER OK - Machine ID:" in result.output
         assert "test-machine" in result.output
-        mock_service_instance.get_value.assert_called_once_with(
+        mock_service_instance.get_result.assert_called_once_with(
             machine_id='test-machine-123',
             dns_name=None
         )
@@ -295,14 +299,18 @@ class TestDetailCommand:
         mock_client.return_value = Mock()
         mock_service_instance = Mock()
         mock_service.return_value = mock_service_instance
-        mock_service_instance.get_value.return_value = 1
+        mock_service_instance.get_result.return_value = 1
+        mock_service_instance.get_result.return_value = {
+            'value': 1,
+            'details': ['Machine ID: test-machine', 'Computer Name: test-pc']
+        }
         mock_service_instance.get_machine_details_json.return_value = '{"id": "test-machine"}'
 
         result = cli_runner.invoke(main, ['detail', '-m', 'test-machine-456'])
 
         assert result.exit_code == 0
-        assert "DEFENDER OK - Machine details retrieved" in result.output
-        mock_service_instance.get_value.assert_called_once_with(
+        assert "DEFENDER OK - Machine ID:" in result.output
+        mock_service_instance.get_result.assert_called_once_with(
             machine_id='test-machine-456',
             dns_name=None
         )
@@ -320,15 +328,19 @@ class TestDetailCommand:
         mock_client.return_value = Mock()
         mock_service_instance = Mock()
         mock_service.return_value = mock_service_instance
-        mock_service_instance.get_value.return_value = 1
+        mock_service_instance.get_result.return_value = 1
+        mock_service_instance.get_result.return_value = {
+            'value': 1,
+            'details': ['Machine ID: test-machine', 'Computer Name: test.domain.com']
+        }
         mock_service_instance.get_machine_details_json.return_value = '{"computerDnsName": "test.domain.com"}'
 
         result = cli_runner.invoke(main, ['detail', '-d', 'test.domain.com'])
 
         assert result.exit_code == 0
-        assert "DEFENDER OK - Machine details retrieved" in result.output
+        assert "DEFENDER OK - Machine ID:" in result.output
         assert "test.domain.com" in result.output
-        mock_service_instance.get_value.assert_called_once_with(
+        mock_service_instance.get_result.assert_called_once_with(
             machine_id=None,
             dns_name='test.domain.com'
         )
@@ -346,7 +358,11 @@ class TestDetailCommand:
         mock_client.return_value = Mock()
         mock_service_instance = Mock()
         mock_service.return_value = mock_service_instance
-        mock_service_instance.get_value.return_value = 0  # Not found
+        mock_service_instance.get_result.return_value = 0  # Not found
+        mock_service_instance.get_result.return_value = {
+            'value': 0,
+            'details': ['Machine not found with DNS name: nonexistent.domain.com']
+        }
 
         result = cli_runner.invoke(main, ['detail', '-d', 'nonexistent.domain.com', '-W', '0'])
 
@@ -367,7 +383,11 @@ class TestDetailCommand:
         mock_client.return_value = Mock()
         mock_service_instance = Mock()
         mock_service.return_value = mock_service_instance
-        mock_service_instance.get_value.return_value = 0  # Not found
+        mock_service_instance.get_result.return_value = 0  # Not found
+        mock_service_instance.get_result.return_value = {
+            'value': 0,
+            'details': ['Machine not found with DNS name: nonexistent.domain.com']
+        }
 
         result = cli_runner.invoke(main, ['detail', '-d', 'nonexistent.domain.com', '-C', '0'])
 

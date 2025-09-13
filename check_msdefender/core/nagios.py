@@ -5,6 +5,28 @@ import nagiosplugin
 from nagiosplugin import Summary
 
 
+class DefenderSummary(nagiosplugin.Summary):
+    """Custom summary class for detailed Nagios output."""
+
+    def __init__(self, details):
+        """Initialize with detailed output lines."""
+        self.details = details or []
+
+    def ok(self, results):
+        """Return detailed output for OK state."""
+        return self._format_details()
+
+    def problem(self, results):
+        """Return detailed output for problem states (WARNING, CRITICAL)."""
+        return self._format_details()
+
+    def _format_details(self):
+        """Format details for output."""
+        if not self.details:
+            return ''
+        return '\n' + '\n'.join(self.details)
+
+
 class NagiosPlugin:
     """Nagios plugin for Microsoft Defender monitoring."""
 
@@ -16,18 +38,18 @@ class NagiosPlugin:
     def check(self, machine_id=None, dns_name=None, warning=None, critical=None, verbose=0):
         """Execute the check and return Nagios exit code."""
         try:
-
-            """Probe the resource and return metrics."""
-            value = self.service.get_value(
+            result = self.service.get_result(
                 machine_id=machine_id,
                 dns_name=dns_name
             )
+            value = result['value']
+            details = result.get('details', [])
 
-            # Create Nagios check
+            # Create Nagios check with custom summary
             check = nagiosplugin.Check(
                 DefenderResource(self.command_name, value),
                 nagiosplugin.ScalarContext(self.command_name, warning, critical),
-
+                DefenderSummary(details)
             )
 
             # Set verbosity

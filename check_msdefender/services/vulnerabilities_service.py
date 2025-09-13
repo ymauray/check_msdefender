@@ -14,13 +14,13 @@ class VulnerabilitiesService:
         self.logger = get_verbose_logger(__name__, verbose_level)
         self._severity_order = {'critical': 0, 'high': 1, 'medium': 2, 'low': 3}
     
-    def get_value(self, machine_id=None, dns_name=None):
-        """Get vulnerability score for a machine."""
-        self.logger.method_entry("get_value", machine_id=machine_id, dns_name=dns_name)
-        
+    def get_result(self, machine_id=None, dns_name=None):
+        """Get vulnerability result with value and details for a machine."""
+        self.logger.method_entry("get_result", machine_id=machine_id, dns_name=dns_name)
+
         if not machine_id and not dns_name:
             raise ValidationError("Either machine_id or dns_name must be provided")
-        
+
         # Get machine ID if DNS name provided
         if dns_name:
             self.logger.info(f"Resolving machine ID for DNS name: {dns_name}")
@@ -29,7 +29,7 @@ class VulnerabilitiesService:
                 raise ValidationError(f"Machine not found with DNS name: {dns_name}")
             machine_id = machines_data['value'][0]['id']
             self.logger.debug(f"Resolved machine ID: {machine_id}")
-        
+
         # Get vulnerabilities for the machine
         self.logger.info(f"Fetching vulnerabilities for machine: {machine_id}")
         vulnerabilities_data = self.client.get_machine_vulnerabilities(machine_id)
@@ -42,8 +42,12 @@ class VulnerabilitiesService:
 
         # Calculate vulnerability score
         score = VulnerabilityScore()
+        details = []
 
-        for vuln in vulnerabilities:
+        # Sort vulnerabilities by severity for consistent output
+        sorted_vulnerabilities = self._sort_by_severity(vulnerabilities)
+
+        for vuln in sorted_vulnerabilities:
             severity = vuln.severity.lower()
             self.logger.debug(f"Processing vulnerability {vuln.id} with severity: {severity}")
 
@@ -56,15 +60,19 @@ class VulnerabilitiesService:
             elif severity == 'low':
                 score.low += 1
 
+            # Add to details list
+            details.append(f"{vuln.id}: {vuln.title} {vuln.severity.upper()}")
+
         self.logger.info(f"Vulnerability score breakdown - Critical: {score.critical}, High: {score.high}, Medium: {score.medium}, Low: {score.low}")
         self.logger.info(f"Total vulnerability score: {score.total_score}")
 
-        # Output detailed vulnerability information
-        self._output_vulnerability_details(vulnerabilities)
+        result = {
+            'value': score.total_score,
+            'details': details
+        }
 
-        self.logger.method_exit("get_value", score.total_score)
-
-        return score.total_score
+        self.logger.method_exit("get_result", result)
+        return result
 
     def get_detailed_vulnerabilities(self, machine_id=None, dns_name=None):
         """Get detailed vulnerability information for a machine."""

@@ -8,7 +8,7 @@ from check_msdefender.core.auth import get_authenticator
 from check_msdefender.core.config import load_config
 from check_msdefender.core.defender import DefenderClient
 from check_msdefender.services.detail_service import DetailService
-from core.nagios import NagiosPlugin
+from check_msdefender.core.nagios import NagiosPlugin
 from ..decorators import common_options
 
 def register_detail_commands(main_group):

@@ -12,9 +12,9 @@ class ListMachinesService:
         self.defender = defender_client
         self.logger = get_verbose_logger(__name__, verbose_level)
 
-    def get_value(self, **kwargs):
-        """Get count of machines."""
-        self.logger.method_entry("get_value")
+    def get_result(self, **kwargs):
+        """Get machine count result with value and details."""
+        self.logger.method_entry("get_result")
 
         # Get all machines
         self.logger.info("Fetching all machines from Defender API")
@@ -22,15 +22,41 @@ class ListMachinesService:
 
         if not machines_data.get('value'):
             self.logger.info("No machines found")
-            self.logger.method_exit("get_value", 0)
-            return 0
+            result = {
+                'value': 0,
+                'details': ["No machines found in Microsoft Defender"]
+            }
+            self.logger.method_exit("get_result", result)
+            return result
 
         machines = machines_data['value']
         machine_count = len(machines)
 
+        # Create detailed output
+        details = [f"Total machines: {machine_count}"]
+
+        # Liat machines
+        # Define the sort order
+        status_priority = {
+            'Onboarded': 1,
+            'InsufficientInfo': 2,
+            'Unsupported': 3
+        }
+
+        # Sort by priority
+        sorted_machines = sorted(machines, key=lambda x: status_priority[x['onboardingStatus']])
+        for machine in sorted_machines:
+            onboarded = "✓" if machine['onboardingStatus'] == "Onboarded" else "✗"
+            details.append(f"{machine['id']}: {machine['computerDnsName']} ({machine['osPlatform']}) {onboarded}")
+
+        result = {
+            'value': machine_count,
+            'details': details
+        }
+
         self.logger.info(f"Found {machine_count} machines")
-        self.logger.method_exit("get_value", machine_count)
-        return machine_count
+        self.logger.method_exit("get_result", result)
+        return result
 
     def get_details(self, **kwargs):
         """Get detailed machine information."""

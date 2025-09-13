@@ -16,47 +16,47 @@ class TestOnboardingServiceFixtures:
         self.mock_client = MockDefenderClient()
         self.service = OnboardingService(self.mock_client)
     
-    def test_get_value_by_machine_id_onboarded(self):
+    def test_get_result_by_machine_id_onboarded(self):
         """Test getting onboarding status by machine ID - Onboarded."""
-        result = self.service.get_value(machine_id="test-machine-1")
-        assert result == OnboardingStatus.ONBOARDED.value
+        result = self.service.get_result(machine_id="test-machine-1")
+        assert result["value"] == OnboardingStatus.ONBOARDED.value
     
-    def test_get_value_by_machine_id_insufficient_info(self):
+    def test_get_result_by_machine_id_insufficient_info(self):
         """Test getting onboarding status by machine ID - InsufficientInfo."""
-        result = self.service.get_value(machine_id="test-machine-2")
-        assert result == OnboardingStatus.INSUFFICIENT_INFO.value
+        result = self.service.get_result(machine_id="test-machine-2")
+        assert result["value"] == OnboardingStatus.INSUFFICIENT_INFO.value
     
-    def test_get_value_by_machine_id_unknown(self):
+    def test_get_result_by_machine_id_unknown(self):
         """Test getting onboarding status by machine ID - Unknown."""
-        result = self.service.get_value(machine_id="test-machine-3")
-        assert result == OnboardingStatus.UNKNOWN.value
+        result = self.service.get_result(machine_id="test-machine-3")
+        assert result["value"] == OnboardingStatus.UNKNOWN.value
     
-    def test_get_value_by_dns_name_onboarded(self):
+    def test_get_result_by_dns_name_onboarded(self):
         """Test getting onboarding status by DNS name - Onboarded."""
-        result = self.service.get_value(dns_name="test-machine-1.domain.com")
-        assert result == OnboardingStatus.ONBOARDED.value
+        result = self.service.get_result(dns_name="test-machine-1.domain.com")
+        assert result["value"] == OnboardingStatus.ONBOARDED.value
     
-    def test_get_value_by_dns_name_insufficient_info(self):
+    def test_get_result_by_dns_name_insufficient_info(self):
         """Test getting onboarding status by DNS name - InsufficientInfo."""
-        result = self.service.get_value(dns_name="test-machine-2.domain.com")
-        assert result == OnboardingStatus.INSUFFICIENT_INFO.value
+        result = self.service.get_result(dns_name="test-machine-2.domain.com")
+        assert result["value"] == OnboardingStatus.INSUFFICIENT_INFO.value
     
-    def test_get_value_no_parameters(self):
+    def test_get_result_no_parameters(self):
         """Test error when no parameters provided."""
         with pytest.raises(ValidationError, match="Either machine_id or dns_name must be provided"):
-            self.service.get_value()
+            self.service.get_result()
     
-    def test_get_value_nonexistent_dns_name(self):
+    def test_get_result_nonexistent_dns_name(self):
         """Test error when DNS name doesn't exist."""
         with pytest.raises(ValidationError, match="Machine not found with DNS name"):
-            self.service.get_value(dns_name="nonexistent.domain.com")
+            self.service.get_result(dns_name="nonexistent.domain.com")
     
-    def test_get_value_nonexistent_machine_id(self):
+    def test_get_result_nonexistent_machine_id(self):
         """Test error when machine ID doesn't exist."""
         with pytest.raises(ValidationError, match="Machine not found"):
-            self.service.get_value(machine_id="nonexistent-machine")
+            self.service.get_result(machine_id="nonexistent-machine")
     
-    def test_get_value_unknown_status_mapping(self):
+    def test_get_result_unknown_status_mapping(self):
         """Test handling of unknown onboarding status values."""
         # Create a mock client that returns unknown status
         class MockClientUnknownStatus:
@@ -67,10 +67,10 @@ class TestOnboardingServiceFixtures:
                 }
         
         service = OnboardingService(MockClientUnknownStatus())
-        result = service.get_value(machine_id="test-machine")
-        assert result == OnboardingStatus.UNKNOWN.value
+        result = service.get_result(machine_id="test-machine")
+        assert result["value"] == OnboardingStatus.UNKNOWN.value
     
-    def test_get_value_missing_onboarding_status(self):
+    def test_get_result_missing_onboarding_status(self):
         """Test handling of missing onboardingStatus field."""
         # Create a mock client that returns no onboarding status
         class MockClientMissingStatus:
@@ -78,5 +78,5 @@ class TestOnboardingServiceFixtures:
                 return {"id": machine_id}
         
         service = OnboardingService(MockClientMissingStatus())
-        result = service.get_value(machine_id="test-machine")
-        assert result == OnboardingStatus.UNKNOWN.value
+        result = service.get_result(machine_id="test-machine")
+        assert result["value"] == OnboardingStatus.UNKNOWN.value

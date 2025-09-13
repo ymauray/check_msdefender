@@ -13,13 +13,13 @@ class DetailService:
         self.defender = defender_client
         self.logger = get_verbose_logger(__name__, verbose_level)
 
-    def get_value(self, machine_id=None, dns_name=None):
-        """Get machine details.
+    def get_result(self, machine_id=None, dns_name=None):
+        """Get machine details result with value and details.
 
         Returns:
-            dict: Machine details, or count of found machines (1 or 0)
+            dict: Result with value (1 or 0) and details list
         """
-        self.logger.method_entry("get_value", machine_id=machine_id, dns_name=dns_name)
+        self.logger.method_entry("get_result", machine_id=machine_id, dns_name=dns_name)
 
         if not machine_id and not dns_name:
             raise ValidationError("Either machine_id or dns_name must be provided")
@@ -31,8 +31,12 @@ class DetailService:
                 machines_data = self.defender.get_machine_by_dns_name(dns_name)
                 if not machines_data.get('value'):
                     self.logger.info(f"Machine not found with DNS name: {dns_name}")
-                    self.logger.method_exit("get_value", 0)
-                    return 0  # Return 0 for not found (used for thresholds)
+                    result = {
+                        'value': 0,
+                        'details': [f"Machine not found with DNS name: {dns_name}"]
+                    }
+                    self.logger.method_exit("get_result", result)
+                    return result
                 machine_data = machines_data['value'][0]
                 self.logger.debug(f"Found machine: {machine_data.get('id', 'unknown')}")
                 machine_id = machine_data.get('id')
@@ -44,9 +48,23 @@ class DetailService:
             # Store the details for output formatting
             self._machine_details = machine_details
 
+            # Create detailed output
+            details = []
+            details.append(f"Machine ID: {machine_details.get('id', 'Unknown')}")
+            details.append(f"Computer Name: {machine_details.get('computerDnsName', 'Unknown')}")
+            details.append(f"OS Platform: {machine_details.get('osPlatform', 'Unknown')}")
+            details.append(f"OS Version: {machine_details.get('osVersion', 'Unknown')}")
+            details.append(f"Health Status: {machine_details.get('healthStatus', 'Unknown')}")
+            details.append(f"Risk Score: {machine_details.get('riskScore', 'Unknown')}")
+
+            result = {
+                'value': 1,
+                'details': details
+            }
+
             self.logger.info(f"Machine details retrieved successfully")
-            self.logger.method_exit("get_value", 1)
-            return 1  # Return 1 for found (used for thresholds)
+            self.logger.method_exit("get_result", result)
+            return result
 
         except Exception as e:
             self.logger.debug(f"Failed to get machine details: {str(e)}")
