@@ -58,6 +58,10 @@ class VulnerabilitiesService:
 
         self.logger.info(f"Vulnerability score breakdown - Critical: {score.critical}, High: {score.high}, Medium: {score.medium}, Low: {score.low}")
         self.logger.info(f"Total vulnerability score: {score.total_score}")
+
+        # Output detailed vulnerability information
+        self._output_vulnerability_details(vulnerabilities)
+
         self.logger.method_exit("get_value", score.total_score)
 
         return score.total_score
@@ -124,3 +128,16 @@ class VulnerabilitiesService:
             vulnerabilities,
             key=lambda v: self._severity_order.get(v.severity.lower(), 999)
         )
+
+    def _output_vulnerability_details(self, vulnerabilities):
+        """Output detailed vulnerability information to stdout."""
+        if not vulnerabilities:
+            return
+
+        # Sort vulnerabilities by severity for output
+        sorted_vulnerabilities = self._sort_by_severity(vulnerabilities)
+
+        # Output each vulnerability in the specified format
+        for vuln in sorted_vulnerabilities:
+            severity = vuln.severity.upper()
+            print(f"{vuln.id}: {vuln.title} {severity}")
