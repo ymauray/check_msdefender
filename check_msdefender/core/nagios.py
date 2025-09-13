@@ -6,7 +6,7 @@ import nagiosplugin
 
 class NagiosPlugin:
     """Nagios plugin for Microsoft Defender monitoring."""
-    
+
     def __init__(self, service, command_name):
         """Initialize with a service and command name."""
         self.service = service
@@ -17,19 +17,24 @@ class NagiosPlugin:
         try:
             # Get value from service
             value = self.service.get_value(machine_id=machine_id, dns_name=dns_name)
-            
-            # Create Nagios check
+
+            # Create Nagios check with appropriate context
+            if self.command_name == 'vulnerabilities':
+                context = VulnerabilityContext(self.command_name, warning, critical)
+            else:
+                context = nagiosplugin.ScalarContext(self.command_name, warning, critical)
+
             check = nagiosplugin.Check(
                 DefenderResource(self.service, machine_id, dns_name, self.command_name),
-                nagiosplugin.ScalarContext(self.command_name, warning, critical)
+                context
             )
-            
+
             # Set verbosity
             check.verbosity = verbose
-            
+
             # Run check
             check.main()
-            
+
         except Exception as e:
             print(f"UNKNOWN: {str(e)}")
             sys.exit(3)
@@ -37,23 +42,60 @@ class NagiosPlugin:
 
 class DefenderResource(nagiosplugin.Resource):
     """Defender resource for getting values with custom service name."""
-    
+
     def __init__(self, service, machine_id, dns_name, command_name):
         super().__init__()
         self.service = service
         self.machine_id = machine_id
         self.dns_name = dns_name
         self.command_name = command_name
-    
-    @property 
+
+    @property
     def name(self):
         """Return custom service name."""
         return 'DEFENDER'
-    
+
     def probe(self):
         """Probe the resource and return metrics."""
         value = self.service.get_value(
             machine_id=self.machine_id,
             dns_name=self.dns_name
         )
+
+        # Get detailed vulnerabilities for vulnerabilities command
+        if self.command_name == 'vulnerabilities' and hasattr(self.service, 'get_detailed_vulnerabilities'):
+            try:
+                vulnerabilities = self.service.get_detailed_vulnerabilities(
+                    machine_id=self.machine_id,
+                    dns_name=self.dns_name
+                )
+                # Add vulnerability details to output
+                self._add_vulnerability_details(vulnerabilities)
+            except Exception:
+                # If detailed vulnerabilities fail, continue with basic output
+                pass
+
         return [nagiosplugin.Metric(self.command_name, value)]
+
+    def _add_vulnerability_details(self, vulnerabilities):
+        """Add vulnerability details to Nagios output."""
+        if not vulnerabilities:
+            return
+
+        # Print detailed vulnerability information
+        for vuln in vulnerabilities:
+            severity = vuln.severity.upper()
+            # Format: CVE-ID: Description SEVERITY
+            print(f"{vuln.id}: {vuln.title} {severity}")
+
+
+class VulnerabilityContext(nagiosplugin.Context):
+    """Custom context for vulnerability checks with detailed output."""
+
+    def __init__(self, name, warning=None, critical=None):
+        super().__init__(name, warning, critical)
+
+    def evaluate(self, metric, resource):
+        """Evaluate metric and return result with custom formatting."""
+        result = super().evaluate(metric, resource)
+        return result
