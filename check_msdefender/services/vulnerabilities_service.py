@@ -80,6 +80,9 @@ class VulnerabilitiesService:
         return result
 
     def clean_and_truncate(self, text, prefix="Summary: ", word_count=10):
+        # Handle None text
+        if text is None:
+            return ""
         # Remove prefix and get first N words
         cleaned = text.replace(prefix, "", 1)  # Remove only first occurrence
         words = cleaned.split()[:word_count]

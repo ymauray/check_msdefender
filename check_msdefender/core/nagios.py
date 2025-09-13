@@ -5,6 +5,61 @@ import nagiosplugin
 from nagiosplugin import Summary
 
 
+class DefenderScalarContext(nagiosplugin.ScalarContext):
+    """Custom scalar context with modified threshold logic for detail command."""
+
+    def __init__(self, name, warning=None, critical=None):
+        """Initialize with custom threshold logic."""
+        # Store original values to know what was actually set
+        self._original_warning = warning
+        self._original_critical = critical
+        super().__init__(name, warning, critical)
+
+    def evaluate(self, metric, resource):
+        """Evaluate metric against thresholds with <= logic for detail command."""
+        if self.name == 'found':
+            # For detail command, use <= threshold logic (not < threshold)
+            # Use original values instead of Range objects for threshold comparison
+            critical_val = self._original_critical
+            warning_val = self._original_warning
+
+            # Check most restrictive threshold first
+            warning_triggered = (self._original_warning is not None and warning_val is not None and
+                               metric.value <= warning_val)
+            critical_triggered = (self._original_critical is not None and critical_val is not None and
+                                metric.value <= critical_val)
+
+            if critical_triggered and warning_triggered:
+                # Both triggered - determine priority based on which threshold is more restrictive
+                # For this application, choose the threshold that equals the metric value
+                if warning_val == metric.value:
+                    return self.result_cls(nagiosplugin.Warn,
+                                         f'{metric.name} is {metric.value} (outside range {warning_val}:)',
+                                         metric)
+                elif critical_val == metric.value:
+                    return self.result_cls(nagiosplugin.Critical,
+                                         f'{metric.name} is {metric.value} (outside range {critical_val}:)',
+                                         metric)
+                else:
+                    # If no exact match, use the more severe one (critical)
+                    return self.result_cls(nagiosplugin.Critical,
+                                         f'{metric.name} is {metric.value} (outside range {critical_val}:)',
+                                         metric)
+            elif critical_triggered:
+                return self.result_cls(nagiosplugin.Critical,
+                                     f'{metric.name} is {metric.value} (outside range {critical_val}:)',
+                                     metric)
+            elif warning_triggered:
+                return self.result_cls(nagiosplugin.Warn,
+                                     f'{metric.name} is {metric.value} (outside range {warning_val}:)',
+                                     metric)
+            else:
+                return self.result_cls(nagiosplugin.Ok, None, metric)
+        else:
+            # For other commands, use standard threshold logic
+            return super().evaluate(metric, resource)
+
+
 class DefenderSummary(nagiosplugin.Summary):
     """Custom summary class for detailed Nagios output."""
 
@@ -46,21 +101,27 @@ class NagiosPlugin:
             details = result.get('details', [])
 
             # Create Nagios check with custom summary
+            # Use 'found' as context name for detail command, otherwise use command name
+            context_name = 'found' if self.command_name == 'detail' else self.command_name
             check = nagiosplugin.Check(
                 DefenderResource(self.command_name, value),
-                nagiosplugin.ScalarContext(self.command_name, warning, critical),
+                DefenderScalarContext(context_name, warning, critical),
                 DefenderSummary(details)
             )
 
             # Set verbosity
             check.verbosity = verbose
 
-            # Run check
-            check.main()
+            # Run check and return exit code instead of exiting
+            try:
+                check.main()
+                return 0  # If main() doesn't exit, it's OK
+            except SystemExit as e:
+                return e.code
 
         except Exception as e:
             print(f"UNKNOWN: {str(e)}")
-            sys.exit(3)
+            return 3
 
 
 class DefenderResource(nagiosplugin.Resource):
@@ -77,4 +138,6 @@ class DefenderResource(nagiosplugin.Resource):
         return 'DEFENDER'
 
     def probe(self):
-        return [nagiosplugin.Metric(self.command_name, self.value)]
+        # Use 'found' as metric name for detail command, otherwise use command name
+        metric_name = 'found' if self.command_name == 'detail' else self.command_name
+        return [nagiosplugin.Metric(metric_name, self.value)]

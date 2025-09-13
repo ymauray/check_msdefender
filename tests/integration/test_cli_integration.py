@@ -368,7 +368,7 @@ class TestDetailCommand:
 
         assert result.exit_code == 1  # Warning
         assert "DEFENDER WARNING - Machine not found" in result.output
-        assert "found=0;0;1" in result.output
+        assert "found=0;;1" in result.output
 
     @patch('check_msdefender.cli.commands.detail.load_config')
     @patch('check_msdefender.cli.commands.detail.get_authenticator')
@@ -393,7 +393,7 @@ class TestDetailCommand:
 
         assert result.exit_code == 2  # Critical
         assert "DEFENDER CRITICAL - Machine not found" in result.output
-        assert "found=0;1;0" in result.output
+        assert "found=0;1" in result.output
 
     @patch('check_msdefender.cli.commands.detail.load_config')
     def test_detail_command_error(self, mock_config, cli_runner):

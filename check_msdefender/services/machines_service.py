@@ -44,7 +44,7 @@ class MachinesService:
         }
 
         # Sort by priority
-        sorted_machines = sorted(machines, key=lambda x: status_priority[x['onboardingStatus']])
+        sorted_machines = sorted(machines, key=lambda x: (status_priority[x['onboardingStatus']], x['computerDnsName']))
         for machine in sorted_machines:
             onboarded = "✓" if machine['onboardingStatus'] == "Onboarded" else "✗"
             details.append(f"{machine['id']}: {machine['computerDnsName']} ({machine['osPlatform']}) {onboarded}")
