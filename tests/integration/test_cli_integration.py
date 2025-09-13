@@ -26,6 +26,7 @@ class TestHelpCommand:
         assert "lastseen" in result.output
         assert "onboarding" in result.output
         assert "vulnerabilities" in result.output
+        assert "detail" in result.output
 
     def test_help_flag(self, cli_runner):
         """Test --help flag displays usage information."""
@@ -245,8 +246,151 @@ class TestVulnerabilitiesCommand:
     def test_vulnerabilities_command_error(self, mock_config, cli_runner):
         """Test vulnerabilities command error handling."""
         mock_config.side_effect = Exception("Service unavailable")
-        
+
         result = cli_runner.invoke(main, ['vulnerabilities', '-d', 'machine.domain.tld'])
-        
+
         assert result.exit_code == 3
         assert "UNKNOWN: Service unavailable" in result.output
+
+
+class TestDetailCommand:
+    """Test detail command functionality."""
+
+    @patch('check_msdefender.cli.commands.detail.load_config')
+    @patch('check_msdefender.cli.commands.detail.get_authenticator')
+    @patch('check_msdefender.cli.commands.detail.DefenderClient')
+    @patch('check_msdefender.cli.commands.detail.DetailService')
+    def test_detail_with_machine_id_using_i_flag(self, mock_service, mock_client,
+                                                mock_auth, mock_config, cli_runner):
+        """Test detail command with machine ID using -i flag."""
+        # Setup mocks
+        mock_config.return_value = {'config': 'test'}
+        mock_auth.return_value = Mock()
+        mock_client.return_value = Mock()
+        mock_service_instance = Mock()
+        mock_service.return_value = mock_service_instance
+        mock_service_instance.get_value.return_value = 1
+        mock_service_instance.get_machine_details_json.return_value = '{"id": "test-machine"}'
+
+        result = cli_runner.invoke(main, ['detail', '-i', 'test-machine-123'])
+
+        assert result.exit_code == 0
+        assert "DEFENDER OK - Machine details retrieved" in result.output
+        assert "test-machine" in result.output
+        mock_service_instance.get_value.assert_called_once_with(
+            machine_id='test-machine-123',
+            dns_name=None
+        )
+
+    @patch('check_msdefender.cli.commands.detail.load_config')
+    @patch('check_msdefender.cli.commands.detail.get_authenticator')
+    @patch('check_msdefender.cli.commands.detail.DefenderClient')
+    @patch('check_msdefender.cli.commands.detail.DetailService')
+    def test_detail_with_machine_id_using_m_flag(self, mock_service, mock_client,
+                                                mock_auth, mock_config, cli_runner):
+        """Test detail command with machine ID using -m flag."""
+        # Setup mocks
+        mock_config.return_value = {'config': 'test'}
+        mock_auth.return_value = Mock()
+        mock_client.return_value = Mock()
+        mock_service_instance = Mock()
+        mock_service.return_value = mock_service_instance
+        mock_service_instance.get_value.return_value = 1
+        mock_service_instance.get_machine_details_json.return_value = '{"id": "test-machine"}'
+
+        result = cli_runner.invoke(main, ['detail', '-m', 'test-machine-456'])
+
+        assert result.exit_code == 0
+        assert "DEFENDER OK - Machine details retrieved" in result.output
+        mock_service_instance.get_value.assert_called_once_with(
+            machine_id='test-machine-456',
+            dns_name=None
+        )
+
+    @patch('check_msdefender.cli.commands.detail.load_config')
+    @patch('check_msdefender.cli.commands.detail.get_authenticator')
+    @patch('check_msdefender.cli.commands.detail.DefenderClient')
+    @patch('check_msdefender.cli.commands.detail.DetailService')
+    def test_detail_with_dns_name(self, mock_service, mock_client,
+                                 mock_auth, mock_config, cli_runner):
+        """Test detail command with DNS name."""
+        # Setup mocks
+        mock_config.return_value = {'config': 'test'}
+        mock_auth.return_value = Mock()
+        mock_client.return_value = Mock()
+        mock_service_instance = Mock()
+        mock_service.return_value = mock_service_instance
+        mock_service_instance.get_value.return_value = 1
+        mock_service_instance.get_machine_details_json.return_value = '{"computerDnsName": "test.domain.com"}'
+
+        result = cli_runner.invoke(main, ['detail', '-d', 'test.domain.com'])
+
+        assert result.exit_code == 0
+        assert "DEFENDER OK - Machine details retrieved" in result.output
+        assert "test.domain.com" in result.output
+        mock_service_instance.get_value.assert_called_once_with(
+            machine_id=None,
+            dns_name='test.domain.com'
+        )
+
+    @patch('check_msdefender.cli.commands.detail.load_config')
+    @patch('check_msdefender.cli.commands.detail.get_authenticator')
+    @patch('check_msdefender.cli.commands.detail.DefenderClient')
+    @patch('check_msdefender.cli.commands.detail.DetailService')
+    def test_detail_machine_not_found_warning(self, mock_service, mock_client,
+                                            mock_auth, mock_config, cli_runner):
+        """Test detail command when machine not found with warning threshold."""
+        # Setup mocks
+        mock_config.return_value = {'config': 'test'}
+        mock_auth.return_value = Mock()
+        mock_client.return_value = Mock()
+        mock_service_instance = Mock()
+        mock_service.return_value = mock_service_instance
+        mock_service_instance.get_value.return_value = 0  # Not found
+
+        result = cli_runner.invoke(main, ['detail', '-d', 'nonexistent.domain.com', '-W', '0'])
+
+        assert result.exit_code == 1  # Warning
+        assert "DEFENDER WARNING - Machine not found" in result.output
+        assert "found=0;0;1" in result.output
+
+    @patch('check_msdefender.cli.commands.detail.load_config')
+    @patch('check_msdefender.cli.commands.detail.get_authenticator')
+    @patch('check_msdefender.cli.commands.detail.DefenderClient')
+    @patch('check_msdefender.cli.commands.detail.DetailService')
+    def test_detail_machine_not_found_critical(self, mock_service, mock_client,
+                                             mock_auth, mock_config, cli_runner):
+        """Test detail command when machine not found with critical threshold."""
+        # Setup mocks
+        mock_config.return_value = {'config': 'test'}
+        mock_auth.return_value = Mock()
+        mock_client.return_value = Mock()
+        mock_service_instance = Mock()
+        mock_service.return_value = mock_service_instance
+        mock_service_instance.get_value.return_value = 0  # Not found
+
+        result = cli_runner.invoke(main, ['detail', '-d', 'nonexistent.domain.com', '-C', '0'])
+
+        assert result.exit_code == 2  # Critical
+        assert "DEFENDER CRITICAL - Machine not found" in result.output
+        assert "found=0;1;0" in result.output
+
+    @patch('check_msdefender.cli.commands.detail.load_config')
+    def test_detail_command_error(self, mock_config, cli_runner):
+        """Test detail command error handling."""
+        mock_config.side_effect = Exception("Authentication failed")
+
+        result = cli_runner.invoke(main, ['detail', '-i', 'test-machine'])
+
+        assert result.exit_code == 3
+        assert "DEFENDER UNKNOWN - Authentication failed" in result.output
+
+    def test_detail_command_help(self, cli_runner):
+        """Test detail command help includes both -i and -m options."""
+        result = cli_runner.invoke(main, ['detail', '--help'])
+
+        assert result.exit_code == 0
+        assert "Get detailed machine information from Microsoft Defender." in result.output
+        assert "-i, --id TEXT" in result.output
+        assert "-m, --machine-id TEXT" in result.output
+        assert "-d, --dns-name TEXT" in result.output

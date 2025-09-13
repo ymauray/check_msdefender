@@ -129,6 +129,40 @@ class DefenderClient:
             self.logger.debug(f"Response: {str(e.response.content)}")
             raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
     
+    def list_machines(self):
+        """Get list of all machines."""
+        self.logger.method_entry("list_machines")
+
+        token = self._get_token()
+
+        url = f"{self.base_url}/api/machines"
+        headers = {
+            'Authorization': f'Bearer {token}',
+            'Content-Type': DefenderClient.application_json
+        }
+
+        params = {
+            '$select': 'id,computerDnsName,onboardingStatus,osPlatform'
+        }
+
+        try:
+            start_time = time.time()
+            self.logger.info("Querying all machines")
+            response = requests.get(url, headers=headers, params=params, timeout=self.timeout)
+            elapsed = time.time() - start_time
+
+            self.logger.api_call("GET", url, response.status_code, elapsed)
+            response.raise_for_status()
+
+            result = response.json()
+            self.logger.json_response(str(result))
+            self.logger.method_exit("list_machines", result)
+            return result
+        except requests.RequestException as e:
+            self.logger.debug(f"API request failed: {str(e)}")
+            self.logger.debug(f"Response: {str(e.response.content)}")
+            raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
+
     def _get_token(self):
         """Get access token from authenticator."""
         self.logger.trace("Getting access token from authenticator")
