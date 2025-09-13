@@ -1,196 +1,156 @@
-# check_msdefender
+# 🛡️ Check MS Defender
 
-A Nagios plugin for monitoring Microsoft Defender API endpoints and checking values.
+[![Python Version](https://img.shields.io/badge/python-3.6+-blue.svg)](https://python.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/lduchosal/check_msdefender)
 
-## Features
+A comprehensive **Nagios plugin** for monitoring Microsoft Defender for Endpoint API endpoints. Built with modern Python practices and designed for enterprise monitoring environments.
 
-- Simple cli interface
-- Nagios plugin compatible output
-- Query Microsoft Defender API endpoints
-- Check and validate returned values against thresholds
-- Support for Client Secret authentication
-- Support for Client Certificate authentication
-- Configuration file for authentication credentials
-- Built using the nagiosplugin library
-- Uses Microsoft Identity SDK for Python (azure-identity)
+## ✨ Features
 
-## Requirements
+- 🔐 **Dual Authentication** - Support for Client Secret and Certificate-based authentication
+- 🎯 **Multiple Endpoints** - Monitor onboarding status, last seen, vulnerabilities, and machine details
+- 📊 **Nagios Compatible** - Standard exit codes and performance data output
+- 🏗️ **Clean Architecture** - Modular design with testable components
+- 🔧 **Flexible Configuration** - File-based configuration with sensible defaults
+- 📈 **Verbose Logging** - Multi-level debugging support
+- 🐍 **Modern Python** - Built with Python 3.6+ using type hints and async patterns
 
-- Python 3.6+
-- click
-- nagiosplugin
-- azure-identity
+## 🚀 Quick Start
 
-## Installation
-
-### Method 1: Install from source (Recommended)
+### Installation
 
 ```bash
-virtualenv /usr/local/libexec/nagios/check_msdefender
-source /usr/local/libexec/nagios/check_msdefender/bin/activate.csh
+# Create virtual environment (recommended)
+python -m venv /usr/local/libexec/nagios/check_msdefender
+source /usr/local/libexec/nagios/check_msdefender/bin/activate
+
+# Install from source
 pip install git+https://github.com/lduchosal/check_msdefender.git
 ```
 
-For development installation:
-```bash
-pip install -e .
-pip install -r requirements-dev.txt
-```
-
-### Post-Installation Setup
-
-Create the default configuration file `check_msdefender.ini` in Nagios base directory (typically `/usr/local/etc/nagios`).
-
-## Authentication
-
-The plugin supports two authentication methods:
-
-### Client Secret Authentication
-
-Create a configuration file with your client credentials:
-
-```ini
-[auth]
-client_id = your-client-id
-client_secret = your-client-secret
-tenant_id = your-tenant-id
-```
-
-### Client Certificate Authentication
-
-For certificate-based authentication:
-
-```ini
-[auth]
-client_id = your-client-id
-tenant_id = your-tenant-id
-certificate_path = /path/to/certificate.pem
-private_key_path = /path/to/private_key.pem
-```
-
-## Usage
-
-After installation via pip, you can use the plugin directly:
+### Basic Usage
 
 ```bash
-check_msdefender [options]
-```
-
-Or run it as a Python module:
-
-```bash
-python -m check_msdefender [options]
-```
-
-The plugin will automatically look for the configuration file `check_msdefender.ini` in the current directory or Nagios base directory. You can override this with the `-c` option:
-
-```bash
-check_msdefender -c /path/to/custom/config.ini [options]
-```
-
-### Command Line Options
-
-- `-c, --config`: Configuration file path (optional, defaults to check_msdefender.ini in current or Nagios base directory)
-- `-m, --machineId`: Machine Identified (GUID)
-- `-d, --computerDnsName`:  Computer DNS Name (FQDN)
-- `-W, --warning`: Warning threshold (numeric value)
-- `-C, --critical`: Critical threshold (numeric value) 
-- `-v, --verbose`: Increase verbosity (use -v, -vv, or -vvv)
-- `-h, --help`: Show help message
-- `--version`: Show version information
-- Defender API endpoint (required)
-
-### Examples
-
-```bash
-# Check onboardingStatus (using default config)
+# Check machine onboarding status
 check_msdefender onboarding -d machine.domain.tld
 
-# Check lastSeen
-check_msdefender lastseen -d machine.domain.tld
+# Check last seen (with custom thresholds)
+check_msdefender lastseen -d machine.domain.tld -W 7 -C 30
 
 # Check vulnerabilities
-check_msdefender vulnerabilities -d machine.domain.tld
+check_msdefender vulnerabilities -d machine.domain.tld -W 10 -C 100
+
+# List all machines
+check_msdefender machines
+
+# Get detailed machine info
+check_msdefender detail -d machine.domain.tld
 ```
 
+## 📋 Available Commands
 
-### Custom examples
+| Command | Description | Default Thresholds |
+|---------|-------------|-------------------|
+| `onboarding` | Check machine onboarding status | W:1, C:2 |
+| `lastseen` | Days since machine last seen | W:7, C:30 |
+| `vulnerabilities` | Vulnerability score calculation | W:10, C:100 |
+| `machines` | List all machines | W:10, C:25 |
+| `detail` | Get detailed machine information | - |
 
-```bash
-# Check onboardingStatus (using  custom config)
-check_msdefender onboarding -c /path/to/check_msdefender.ini -d "machine.domain.tld" -W 1 -C 2
+### Vulnerability Scoring
 
-# Check lastSeen, warning if > 1 week, critical if > 1 month
-check_msdefender lastseen -d "machine.domain.tld" -W 7 -C 30
+The vulnerability score is calculated as:
+- **Critical vulnerabilities** × 100
+- **High vulnerabilities** × 10
+- **Medium vulnerabilities** × 5
+- **Low vulnerabilities** × 1
 
-# Check vulnerabilities, critical if > 1 critical vulnerability, warning if > 1 high vulnerability
-check_msdefender vulnerabilities -d "machine.domain.tld" -W 10 -C 100
-```
+### Onboarding Status Values
 
-### Supported Endpoints
+- `0` - Onboarded ✅
+- `1` - InsufficientInfo ⚠️
+- `2` - Unknown ❌
 
-- `onboarding`: Onboarded = (0), InsufficientInfo = (1), Unknown = (2)
-- `lastseen`: Number of days since last seen (7)
-- `vulnerabilities`: Sum of critical (*100) + high (*10) + medium (*5) + low (*1)
-- `machines`: List machines
-- `detail`: Detail of a machine
+## ⚙️ Configuration
 
-## Configuration File Format
+### Authentication Setup
 
+Create `check_msdefender.ini` in your Nagios directory or current working directory:
+
+#### Client Secret Authentication
 ```ini
 [auth]
-# Required for both authentication methods
 client_id = your-application-client-id
+client_secret = your-client-secret
 tenant_id = your-azure-tenant-id
 
-# For Client Secret authentication
-client_secret = your-client-secret
+[settings]
+timeout = 5
+```
 
-# For Client Certificate authentication (alternative to client_secret)
+#### Certificate Authentication
+```ini
+[auth]
+client_id = your-application-client-id
+tenant_id = your-azure-tenant-id
 certificate_path = /path/to/certificate.pem
 private_key_path = /path/to/private_key.pem
 
 [settings]
-# Optional: Timeout in seconds (default: 5)
 timeout = 5
 ```
 
-## Nagios Configuration
+### Microsoft Defender API Setup
 
-### For pip-installed plugin:
+1. **Register Application** in Azure Active Directory
+2. **Grant API Permissions**:
+   - `Machine.Read.All`
+   - `Vulnerability.Read`
+   - `Vulnerability.Read.All`
+3. **Create Authentication** (Secret or Certificate)
+4. **Note Credentials** (Client ID, Tenant ID, Secret/Certificate)
 
-Add the following to your Nagios commands configuration:
+📚 [Complete API Setup Guide](https://learn.microsoft.com/en-us/defender-endpoint/api/api-hello-world)
+
+## 🔧 Command Line Options
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `-c, --config` | Configuration file path | `-c /custom/path/config.ini` |
+| `-m, --machineId` | Machine ID (GUID) | `-m "12345678-1234-1234-1234-123456789abc"` |
+| `-d, --computerDnsName` | Computer DNS Name (FQDN) | `-d "server.domain.com"` |
+| `-W, --warning` | Warning threshold | `-W 10` |
+| `-C, --critical` | Critical threshold | `-C 100` |
+| `-v, --verbose` | Verbosity level | `-v`, `-vv`, `-vvv` |
+| `--version` | Show version | `--version` |
+
+## 🏢 Nagios Integration
+
+### Command Definitions
 
 ```cfg
-#
-# check_msdefender
-#
-
-# /usr/local/libexec/nagios/check_msdefender/bin/check_msdefender
-
+# Microsoft Defender Commands
 define command {
-    command_name    check_defender_vulnerabilities
-    command_line    $USER1$/check_msdefender/bin/check_msdefender vulnerabilities -d $HOSTALIAS$ 
+    command_name    check_defender_onboarding
+    command_line    $USER1$/check_msdefender/bin/check_msdefender onboarding -d $HOSTALIAS$
 }
 
 define command {
     command_name    check_defender_lastseen
-    command_line    $USER1$/check_msdefender/bin/check_msdefender lastseen -d $HOSTALIAS$ 
+    command_line    $USER1$/check_msdefender/bin/check_msdefender lastseen -d $HOSTALIAS$ -W 7 -C 30
 }
 
 define command {
-    command_name    check_defender_onboarding
-    command_line    $USER1$/check_msdefender/bin/check_msdefender onboarding -d $HOSTALIAS$ 
+    command_name    check_defender_vulnerabilities
+    command_line    $USER1$/check_msdefender/bin/check_msdefender vulnerabilities -d $HOSTALIAS$ -W 10 -C 100
 }
 ```
 
-### Service definition examples:
+### Service Definitions
 
 ```cfg
-#
-# svc-msdefender
-#
-
+# Microsoft Defender Services
 define service {
     use                     generic-service
     service_description     DEFENDER_ONBOARDING
@@ -213,178 +173,187 @@ define service {
 }
 ```
 
-## Microsoft Defender API Setup
+## 🏗️ Architecture
 
-https://learn.microsoft.com/en-us/defender-endpoint/api/api-hello-world
-
-1. Register an application in Azure Active Directory
-2. Grant necessary Graph API permissions
-3. Generate either a client secret or upload a certificate
-4. Note down the client ID, tenant ID, and authentication credentials
-
-Required API permissions (minimum):
-
-WindowsDefenderATP (3)
-Machine.Read.All
-Vulnerability.Read
-Vulnerability.Read.All
-
-## Architecture
-
-This plugin follows clean architecture principles:
-
-### Package Structure
+This plugin follows **clean architecture** principles with clear separation of concerns:
 
 ```
-├── pyproject.toml                           # Modern Python packaging configuration
-├── README.md                                # This documentation
-├── LICENSE                                  # MIT License
-├── check_msdefender.ini                     # Default configuration template
-├── check_msdefender/                        # Python package
-│   ├── __init__.py
-│   ├── check_msdefender.py                  # Main entry point
-│   ├── cli/
-│   │   ├── onboarding_status.py
-│   │   ├── last_seen.py
-│   │   ├── vulnerabilities.py
-│   │   ├── __init__.py
-│   │   └── __main__.py                      # Support for `python -m check_msdefender`
-│   ├── core/
-│   │   ├── __init__.py
-│   │   ├── nagios.py                        # NagiosPlugin implementation
-│   │   ├── config.py                        # Configuration management
-│   │   ├── auth.py                          # Authentication
-│   │   ├── defender.py                      # Defender API client
-│   │   └── exceptions.py                    # Custom exceptions
-│   └── services/
-│       ├── __init__.py
-│       ├── onboarding_status_service.py     # onboarding_status implementation
-│       ├── last_seen_service.py             # last_seen_service implementation
-│       ├── vulnerabilities_service.py       # vulnerabilities implementation
-│       └── models.py                        # Data models
-└── tests/                                   # Test suite 
-    ├── unit/
-    ├── integration/
-    └── fixtures/
+check_msdefender/
+├── 📁 cli/                     # Command-line interface
+│   ├── commands/               # Individual command handlers
+│   │   ├── onboarding.py      # Onboarding status command
+│   │   ├── lastseen.py        # Last seen command
+│   │   ├── vulnerabilities.py # Vulnerabilities command
+│   │   ├── machines.py        # List machines command
+│   │   └── detail.py          # Machine detail command
+│   ├── decorators.py          # Common CLI decorators
+│   └── handlers.py            # CLI handlers
+├── 📁 core/                    # Core business logic
+│   ├── auth.py                # Authentication management
+│   ├── config.py              # Configuration handling
+│   ├── defender.py            # Defender API client
+│   ├── exceptions.py          # Custom exceptions
+│   ├── nagios.py              # Nagios plugin framework
+│   └── logging_config.py      # Logging configuration
+├── 📁 services/                # Business services
+│   ├── onboarding_service.py  # Onboarding business logic
+│   ├── lastseen_service.py    # Last seen business logic
+│   ├── vulnerabilities_service.py # Vulnerability business logic
+│   ├── machines_service.py    # Machines business logic
+│   ├── detail_service.py      # Detail business logic
+│   └── models.py              # Data models
+└── 📁 tests/                   # Comprehensive test suite
+    ├── unit/                   # Unit tests
+    ├── integration/            # Integration tests
+    └── fixtures/               # Test fixtures
 ```
 
-Each component is:
-- **Testable**: Clear interfaces and dependency injection
-- **Extensible**: New authentication methods and validators can be added
-- **Maintainable**: Separated concerns and minimal coupling
+### Key Design Principles
 
-## Output
+- **🎯 Single Responsibility** - Each module has one clear purpose
+- **🔌 Dependency Injection** - Easy testing and mocking
+- **🧪 Testable** - Comprehensive test coverage
+- **📈 Extensible** - Easy to add new commands and features
+- **🔒 Secure** - No secrets in code, proper credential handling
 
-The plugin returns standard Nagios exit codes:
-- 0 (OK): Value is within acceptable range
-- 1 (WARNING): Value exceeds warning threshold
-- 2 (CRITICAL): Value exceeds critical threshold  
-- 3 (UNKNOWN): Error occurred during execution
+## 🧪 Development
 
-## Development
+### Development Setup
 
-### Setting up Development Environment
-
-1. Clone the repository:
 ```bash
+# Clone repository
 git clone https://github.com/lduchosal/check_msdefender.git
 cd check_msdefender
-```
 
-2. Create a virtual environment:
-```bash
+# Create development environment
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-3. Install in development mode:
-```bash
+# Install in development mode
 pip install -e .
 pip install -r requirements-dev.txt
 ```
 
-### Building the Package
-
-```bash
-python -m build
-```
-
-This creates both wheel and source distributions in the `dist/` directory.
-
-### Running Tests
-
-```bash
-pytest tests/
-```
-
-### Code Quality
+### Code Quality Tools
 
 ```bash
 # Format code
 black check_msdefender/
 
-# Lint code  
+# Lint code
 flake8 check_msdefender/
 
 # Type checking
 mypy check_msdefender/
+
+# Run tests
+pytest tests/ -v --cov=check_msdefender
 ```
 
-## Publishing to PyPI
-
-### Test PyPI (for testing)
+### Building & Publishing
 
 ```bash
-python -m twine upload --repository testpypi dist/*
-```
+# Build package
+python -m build
 
-### Production PyPI
+# Test installation
+pip install dist/*.whl
 
-```bash
+# Publish to PyPI
 python -m twine upload dist/*
 ```
 
-## Troubleshooting
+## 🔍 Output Examples
+
+### Successful Check
+```
+DEFENDER OK - Onboarding status: 0 (Onboarded) | onboarding=0;1;2;0;2
+```
+
+### Warning State
+```
+DEFENDER WARNING - Last seen: 10 days ago | lastseen=10;7;30;0;
+```
+
+### Critical State
+```
+DEFENDER CRITICAL - Vulnerability score: 150 (1 Critical, 5 High) | vulnerabilities=150;10;100;0;
+```
+
+## 🔧 Troubleshooting
 
 ### Common Issues
 
-- **Authentication Errors**: Ensure your Azure application has the required Graph API permissions
-- **Configuration Issues**: Check that your authentication credentials are correct in the config file
-- **Import Errors**: Make sure all dependencies are installed correctly
-- **Network Connectivity**: Verify connectivity (firewall) to 
-```
-api-eu.securitycenter.microsoft.com
-api-eu3.securitycenter.microsoft.com
-api.securitycenter.microsoft.com
-api-uk.securitycenter.microsoft.com
-
-login.microsoftonline.com
-```
+| Issue | Solution |
+|-------|----------|
+| **Authentication Errors** | Verify Azure app permissions and credentials |
+| **Network Connectivity** | Check firewall rules for Microsoft endpoints |
+| **Import Errors** | Ensure all dependencies are installed |
+| **Configuration Issues** | Validate config file syntax and paths |
 
 ### Debug Mode
 
-Run with verbose output for troubleshooting:
+Enable verbose logging for detailed troubleshooting:
 
 ```bash
-check_msdefender vulnerabilities -vvvv
+# Maximum verbosity
+check_msdefender vulnerabilities -d machine.domain.tld -vvv
+
+# Check specific configuration
+check_msdefender onboarding -c /path/to/config.ini -d machine.domain.tld -vv
 ```
 
-### Log Analysis
+### Required Network Access
 
-Review Nagios logs for detailed error messages:
+Ensure connectivity to:
+- `login.microsoftonline.com`
+- `api.securitycenter.microsoft.com`
+- `api-eu.securitycenter.microsoft.com`
+- `api-eu3.securitycenter.microsoft.com`
+- `api-uk.securitycenter.microsoft.com`
 
-```bash
-tail -f /var/logs/nagios/nagios.log
-```
+## 📊 Exit Codes
 
-## Contributing
+| Code | Status | Description |
+|------|--------|-------------|
+| `0` | OK | Value within acceptable range |
+| `1` | WARNING | Value exceeds warning threshold |
+| `2` | CRITICAL | Value exceeds critical threshold |
+| `3` | UNKNOWN | Error occurred during execution |
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## 🤝 Contributing
 
-## License
+We welcome contributions! Here's how to get started:
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Development Guidelines
+
+- Follow [PEP 8](https://pep8.org/) style guide
+- Add tests for new features
+- Update documentation as needed
+- Ensure all tests pass before submitting
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with [nagiosplugin](https://nagiosplugin.readthedocs.io/) framework
+- Uses [Azure Identity SDK](https://docs.microsoft.com/python/api/azure-identity/) for authentication
+- Powered by [Click](https://click.palletsprojects.com/) for CLI interface
+
+---
+
+<div align="center">
+
+**[⭐ Star this repository](https://github.com/lduchosal/check_msdefender)** if you find it useful!
+
+[🐛 Report Bug](https://github.com/lduchosal/check_msdefender/issues) • [💡 Request Feature](https://github.com/lduchosal/check_msdefender/issues) • [📖 Documentation](https://github.com/lduchosal/check_msdefender/blob/main/README.md)
+
+</div>
