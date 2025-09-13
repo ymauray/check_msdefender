@@ -21,7 +21,7 @@ List all machines in Microsoft Defender for Endpoint.
 
 ### Command Structure
 ```bash
-check_msdefender listmachines [OPTIONS]
+check_msdefender machines [OPTIONS]
 ```
 
 ### Options
@@ -32,12 +32,12 @@ check_msdefender listmachines [OPTIONS]
 
 ### Example Usage
 ```bash
-check_msdefender listmachines -W 10 -C 25
+check_msdefender machines -W 10 -C 25
 ```
 
 ### Sample Output
 ```
-DEFENDER OK - listmachines is 4 | listmachines=4;10;25
+DEFENDER OK - machines is 4 | machines=4;10;25
 88xxxxxxxx01 ma1.domain.tld Onboarded Windows11
 88xxxxxxxx02 ma2.domain.tld Onboarded Windows11
 88xxxxxxxx03 ma3.domain.tld Onboarded Windows11
@@ -53,22 +53,22 @@ DEFENDER OK - listmachines is 4 | listmachines=4;10;25
 - **3 (UNKNOWN)**: API error or authentication failure
 
 ### Performance Data
-Format: `listmachines=<current>;<warning>;<critical>`
+Format: `machines=<current>;<warning>;<critical>`
 
 ### Output Format
 ```
-DEFENDER <STATUS> - listmachines is <count> | listmachines=<count>;<warning>;<critical>
+DEFENDER <STATUS> - machines is <count> | machines=<count>;<warning>;<critical>
 <machine_details>
 ```
 
 ## Implementation Details
 
 ### Cli 
-- cli : check_msdefender/cli/commands/listmachines.py
+- cli : check_msdefender/cli/commands/machines.py
   use lastseen.py as a template
 
 ### Service 
-- service:  check_msdefender/services/listmachines_service.py
+- service:  check_msdefender/services/machines_service.py
   use lastseen_service.py as a template
 
 ### Core 
@@ -80,8 +80,8 @@ DEFENDER <STATUS> - listmachines is <count> | listmachines=<count>;<warning>;<cr
 ## File Structure
 ```
 check_msdefender/
-├── cli/commands/listmachines.py          # CLI command implementation
-├── services/listmachines_service.py      # Business logic service
+├── cli/commands/machines.py          # CLI command implementation
+├── services/machines_service.py      # Business logic service
 └── core/defender.py               # API client (get_machine_by_id exists)
 ```
 

@@ -1,10 +1,10 @@
-"""List machines service implementation."""
+"""Machines service implementation."""
 
 from check_msdefender.core.exceptions import ValidationError
 from check_msdefender.core.logging_config import get_verbose_logger
 
 
-class ListMachinesService:
+class MachinesService:
     """Service for listing machines."""
 
     def __init__(self, defender_client, verbose_level=0):

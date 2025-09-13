@@ -132,6 +132,8 @@ check_msdefender vulnerabilities -d "machine.domain.tld" -W 10 -C 100
 - `onboarding`: Onboarded = (0), InsufficientInfo = (1), Unknown = (2)
 - `lastseen`: Number of days since last seen (7)
 - `vulnerabilities`: Sum of critical (*100) + high (*10) + medium (*5) + low (*1)
+- `machines`: List machines
+- `detail`: Detail of a machine
 
 ## Configuration File Format
 
