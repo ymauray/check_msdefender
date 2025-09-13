@@ -129,8 +129,8 @@ check_msdefender vulnerabilities -d "machine.domain.tld" -W 10 -C 100
 
 ### Supported Endpoints
 
-- `onboardingStatus`: Onboarded = (0), InsufficientInfo = (1), Unknown = (2)
-- `lastSeen`: Number of days since last seen (7)
+- `onboarding`: Onboarded = (0), InsufficientInfo = (1), Unknown = (2)
+- `lastseen`: Number of days since last seen (7)
 - `vulnerabilities`: Sum of critical (*100) + high (*10) + medium (*5) + low (*1)
 
 ## Configuration File Format
@@ -364,7 +364,7 @@ login.microsoftonline.com
 Run with verbose output for troubleshooting:
 
 ```bash
-check_msdefender vulnerabilities -v -v -v
+check_msdefender vulnerabilities -vvvv
 ```
 
 ### Log Analysis
