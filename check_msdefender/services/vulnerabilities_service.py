@@ -42,6 +42,8 @@ class VulnerabilitiesService:
 
         # Calculate vulnerability score
         score = VulnerabilityScore()
+
+        # Create detailed output
         details = []
 
         # Sort vulnerabilities by severity for consistent output
@@ -60,11 +62,14 @@ class VulnerabilitiesService:
             elif severity == 'low':
                 score.low += 1
 
+            description = self.clean_and_truncate(vuln.description)
             # Add to details list
-            details.append(f"{vuln.id}: {vuln.title} {vuln.severity.upper()}")
+            details.append(f"{vuln.id}: {description} {vuln.severity.upper()}")
 
         self.logger.info(f"Vulnerability score breakdown - Critical: {score.critical}, High: {score.high}, Medium: {score.medium}, Low: {score.low}")
         self.logger.info(f"Total vulnerability score: {score.total_score}")
+
+        details.insert(0,f"Vulnerabilities: {len(raw_vulnerabilities)}, score: {score.total_score}")
 
         result = {
             'value': score.total_score,
@@ -73,6 +78,12 @@ class VulnerabilitiesService:
 
         self.logger.method_exit("get_result", result)
         return result
+
+    def clean_and_truncate(self, text, prefix="Summary: ", word_count=10):
+        # Remove prefix and get first N words
+        cleaned = text.replace(prefix, "", 1)  # Remove only first occurrence
+        words = cleaned.split()[:word_count]
+        return " ".join(words)
 
     def get_detailed_vulnerabilities(self, machine_id=None, dns_name=None):
         """Get detailed vulnerability information for a machine."""
@@ -136,16 +147,3 @@ class VulnerabilitiesService:
             vulnerabilities,
             key=lambda v: self._severity_order.get(v.severity.lower(), 999)
         )
-
-    def _output_vulnerability_details(self, vulnerabilities):
-        """Output detailed vulnerability information to stdout."""
-        if not vulnerabilities:
-            return
-
-        # Sort vulnerabilities by severity for output
-        sorted_vulnerabilities = self._sort_by_severity(vulnerabilities)
-
-        # Output each vulnerability in the specified format
-        for vuln in sorted_vulnerabilities:
-            severity = vuln.severity.upper()
-            print(f"{vuln.id}: {vuln.title} {severity}")
