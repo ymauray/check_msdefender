@@ -10,7 +10,8 @@
       "Bash(python:*)",
       "Bash(find:*)",
       "Bash(echo \"Exit code: $?\")",
-      "Bash(mypy:*)"
+      "Bash(mypy:*)",
+      "Bash(black:*)"
     ],
     "deny": [],
     "ask": []

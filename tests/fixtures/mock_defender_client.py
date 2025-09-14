@@ -21,6 +21,10 @@ class MockDefenderClient:
         with open(fixtures_dir / "vulnerability_data.json") as f:
             self.vulnerability_data = json.load(f)
 
+        # Load alerts data
+        with open(fixtures_dir / "alerts_data.json") as f:
+            self.alerts_data = json.load(f)
+
     def get_machine_by_id(self, machine_id):
         """Get machine by ID from fixtures."""
         machine = self.machine_data["machine_by_id"].get(machine_id)
@@ -35,3 +39,7 @@ class MockDefenderClient:
     def get_machine_vulnerabilities(self, machine_id):
         """Get vulnerabilities for machine from fixtures."""
         return self.vulnerability_data["vulnerabilities_by_machine"].get(machine_id, {"value": []})
+
+    def get_alerts(self):
+        """Get all alerts from fixtures."""
+        return self.alerts_data["alerts"]

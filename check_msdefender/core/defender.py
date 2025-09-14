@@ -167,6 +167,44 @@ class DefenderClient:
                 self.logger.debug(f"Response: {str(e.response.content)}")
             raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
 
+    def get_alerts(self) -> Dict[str, Any]:
+        """Get alerts from Microsoft Defender."""
+        self.logger.method_entry("get_alerts")
+
+        token = self._get_token()
+
+        url = f"{self.base_url}/api/alerts"
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": DefenderClient.application_json,
+        }
+
+        params = {
+            "$top": "100",
+            "$expand": "evidence",
+            "$orderby": "alertCreationTime desc",
+            "$select": "status,title,machineId,computerDnsName,alertCreationTime,firstEventTime,lastEventTime,lastUpdateTime,severity",
+        }
+
+        try:
+            start_time = time.time()
+            self.logger.info("Querying alerts")
+            response = requests.get(url, headers=headers, params=params, timeout=self.timeout)
+            elapsed = time.time() - start_time
+
+            self.logger.api_call("GET", url, response.status_code, elapsed)
+            response.raise_for_status()
+
+            result = cast(Dict[str, Any], response.json())
+            self.logger.json_response(str(result))
+            self.logger.method_exit("get_alerts", result)
+            return result
+        except requests.RequestException as e:
+            self.logger.debug(f"API request failed: {str(e)}")
+            if hasattr(e, "response") and e.response is not None:
+                self.logger.debug(f"Response: {str(e.response.content)}")
+            raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
+
     def _get_token(self) -> str:
         """Get access token from authenticator."""
         self.logger.trace("Getting access token from authenticator")

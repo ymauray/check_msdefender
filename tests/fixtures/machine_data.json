@@ -44,6 +44,21 @@
       "rbacGroupId": 789,
       "riskScore": "High",
       "onboardingStatus": "Unknown"
+    },
+    "test-machine-4": {
+      "id": "test-machine-4",
+      "computerDnsName": "test-machine-4.domain.com",
+      "lastSeen": "2024-01-08T12:00:00Z",
+      "osPlatform": "Windows11",
+      "version": "22H2",
+      "osProcessor": "x64",
+      "lastIpAddress": "192.168.1.103",
+      "lastExternalIpAddress": "203.0.113.4",
+      "healthStatus": "Active",
+      "deviceValue": "Normal",
+      "rbacGroupId": 999,
+      "riskScore": "Low",
+      "onboardingStatus": "Onboarded"
     }
   },
   "machine_by_dns": {
@@ -58,6 +73,13 @@
       "value": [
         {
           "id": "test-machine-2"
+        }
+      ]
+    },
+    "test-machine-3.domain.com": {
+      "value": [
+        {
+          "id": "test-machine-3"
         }
       ]
     },
