@@ -5,16 +5,16 @@ import os
 from pathlib import Path
 
 
-def load_config(config_path='check_msdefender.ini'):
+def load_config(config_path="check_msdefender.ini"):
     """Load configuration from file."""
     config = configparser.ConfigParser()
-    
+
     # Try to find config file
     config_file = _find_config_file(config_path)
-    
+
     if not config_file or not os.path.exists(config_file):
         raise FileNotFoundError(f"Configuration file not found: {config_path}")
-    
+
     config.read(config_file)
     return config
 
@@ -24,16 +24,16 @@ def _find_config_file(config_path):
     # If absolute path provided, use it
     if os.path.isabs(config_path):
         return config_path
-    
+
     # Try current directory
     current_dir = Path.cwd() / config_path
     if current_dir.exists():
         return str(current_dir)
-    
+
     # Try Nagios base directory
-    nagios_base = Path('/usr/local/etc/nagios') / config_path
+    nagios_base = Path("/usr/local/etc/nagios") / config_path
     if nagios_base.exists():
         return str(nagios_base)
-    
+
     # Return original path (will fail later if not found)
     return config_path

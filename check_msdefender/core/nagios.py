@@ -17,42 +17,58 @@ class DefenderScalarContext(nagiosplugin.ScalarContext):
 
     def evaluate(self, metric, resource):
         """Evaluate metric against thresholds with <= logic for detail command."""
-        if self.name == 'found':
+        if self.name == "found":
             # For detail command, use <= threshold logic (not < threshold)
             # Use original values instead of Range objects for threshold comparison
             critical_val = self._original_critical
             warning_val = self._original_warning
 
             # Check most restrictive threshold first
-            warning_triggered = (self._original_warning is not None and warning_val is not None and
-                               metric.value <= warning_val)
-            critical_triggered = (self._original_critical is not None and critical_val is not None and
-                                metric.value <= critical_val)
+            warning_triggered = (
+                self._original_warning is not None
+                and warning_val is not None
+                and metric.value <= warning_val
+            )
+            critical_triggered = (
+                self._original_critical is not None
+                and critical_val is not None
+                and metric.value <= critical_val
+            )
 
             if critical_triggered and warning_triggered:
                 # Both triggered - determine priority based on which threshold is more restrictive
                 # For this application, choose the threshold that equals the metric value
                 if warning_val == metric.value:
-                    return self.result_cls(nagiosplugin.Warn,
-                                         f'{metric.name} is {metric.value} (outside range {warning_val}:)',
-                                         metric)
+                    return self.result_cls(
+                        nagiosplugin.Warn,
+                        f"{metric.name} is {metric.value} (outside range {warning_val}:)",
+                        metric,
+                    )
                 elif critical_val == metric.value:
-                    return self.result_cls(nagiosplugin.Critical,
-                                         f'{metric.name} is {metric.value} (outside range {critical_val}:)',
-                                         metric)
+                    return self.result_cls(
+                        nagiosplugin.Critical,
+                        f"{metric.name} is {metric.value} (outside range {critical_val}:)",
+                        metric,
+                    )
                 else:
                     # If no exact match, use the more severe one (critical)
-                    return self.result_cls(nagiosplugin.Critical,
-                                         f'{metric.name} is {metric.value} (outside range {critical_val}:)',
-                                         metric)
+                    return self.result_cls(
+                        nagiosplugin.Critical,
+                        f"{metric.name} is {metric.value} (outside range {critical_val}:)",
+                        metric,
+                    )
             elif critical_triggered:
-                return self.result_cls(nagiosplugin.Critical,
-                                     f'{metric.name} is {metric.value} (outside range {critical_val}:)',
-                                     metric)
+                return self.result_cls(
+                    nagiosplugin.Critical,
+                    f"{metric.name} is {metric.value} (outside range {critical_val}:)",
+                    metric,
+                )
             elif warning_triggered:
-                return self.result_cls(nagiosplugin.Warn,
-                                     f'{metric.name} is {metric.value} (outside range {warning_val}:)',
-                                     metric)
+                return self.result_cls(
+                    nagiosplugin.Warn,
+                    f"{metric.name} is {metric.value} (outside range {warning_val}:)",
+                    metric,
+                )
             else:
                 return self.result_cls(nagiosplugin.Ok, None, metric)
         else:
@@ -78,8 +94,8 @@ class DefenderSummary(nagiosplugin.Summary):
     def _format_details(self):
         """Format details for output."""
         if not self.details:
-            return ''
-        return '\n' + '\n'.join(self.details)
+            return ""
+        return "\n" + "\n".join(self.details)
 
 
 class NagiosPlugin:
@@ -89,24 +105,21 @@ class NagiosPlugin:
         """Initialize with a service and command name."""
         self.service = service
         self.command_name = command_name
-    
+
     def check(self, machine_id=None, dns_name=None, warning=None, critical=None, verbose=0):
         """Execute the check and return Nagios exit code."""
         try:
-            result = self.service.get_result(
-                machine_id=machine_id,
-                dns_name=dns_name
-            )
-            value = result['value']
-            details = result.get('details', [])
+            result = self.service.get_result(machine_id=machine_id, dns_name=dns_name)
+            value = result["value"]
+            details = result.get("details", [])
 
             # Create Nagios check with custom summary
             # Use 'found' as context name for detail command, otherwise use command name
-            context_name = 'found' if self.command_name == 'detail' else self.command_name
+            context_name = "found" if self.command_name == "detail" else self.command_name
             check = nagiosplugin.Check(
                 DefenderResource(self.command_name, value),
                 DefenderScalarContext(context_name, warning, critical),
-                DefenderSummary(details)
+                DefenderSummary(details),
             )
 
             # Set verbosity
@@ -135,9 +148,9 @@ class DefenderResource(nagiosplugin.Resource):
     @property
     def name(self):
         """Return custom service name."""
-        return 'DEFENDER'
+        return "DEFENDER"
 
     def probe(self):
         # Use 'found' as metric name for detail command, otherwise use command name
-        metric_name = 'found' if self.command_name == 'detail' else self.command_name
+        metric_name = "found" if self.command_name == "detail" else self.command_name
         return [nagiosplugin.Metric(metric_name, self.value)]

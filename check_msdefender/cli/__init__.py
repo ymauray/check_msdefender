@@ -10,5 +10,6 @@ def main():
     """Check Microsoft Defender API endpoints and validate values."""
     pass
 
+
 # Register all commands
 register_all_commands(main)

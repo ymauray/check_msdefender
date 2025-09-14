@@ -19,7 +19,7 @@ class TestDetailService:
     def test_init(self):
         """Test service initialization."""
         assert self.service.defender == self.mock_client
-        assert hasattr(self.service, 'logger')
+        assert hasattr(self.service, "logger")
 
     def test_get_result_by_machine_id_success(self):
         """Test successful retrieval by machine ID."""
@@ -28,7 +28,7 @@ class TestDetailService:
             "id": "test-machine-123",
             "computerDnsName": "test.domain.com",
             "osPlatform": "Windows10",
-            "lastSeen": "2024-01-15T10:30:00Z"
+            "lastSeen": "2024-01-15T10:30:00Z",
         }
         self.mock_client.get_machine_by_id.return_value = mock_machine_data
 
@@ -41,19 +41,14 @@ class TestDetailService:
         self.mock_client.get_machine_by_id.assert_called_once_with("test-machine-123")
 
         # Should store the machine details
-        assert hasattr(self.service, '_machine_details')
+        assert hasattr(self.service, "_machine_details")
         assert self.service._machine_details == mock_machine_data
 
     def test_get_result_by_dns_name_success(self):
         """Test successful retrieval by DNS name."""
         # Mock DNS lookup response
-        mock_dns_response = {
-            "value": [{"id": "test-machine-456"}]
-        }
-        mock_machine_data = {
-            "id": "test-machine-456",
-            "computerDnsName": "test.domain.com"
-        }
+        mock_dns_response = {"value": [{"id": "test-machine-456"}]}
+        mock_machine_data = {"id": "test-machine-456", "computerDnsName": "test.domain.com"}
 
         self.mock_client.get_machine_by_dns_name.return_value = mock_dns_response
         self.mock_client.get_machine_by_id.return_value = mock_machine_data
@@ -105,7 +100,7 @@ class TestDetailService:
         mock_data = {
             "id": "test-machine",
             "computerDnsName": "test.domain.com",
-            "osPlatform": "Windows10"
+            "osPlatform": "Windows10",
         }
         self.service._machine_details = mock_data
 
@@ -144,7 +139,7 @@ class TestDetailService:
         assert self.service.logger.method_exit.call_count == 1
         exit_call_args = self.service.logger.method_exit.call_args[0]
         assert exit_call_args[0] == "get_result"
-        assert exit_call_args[1]['value'] == 1
+        assert exit_call_args[1]["value"] == 1
 
     def test_dns_name_with_machine_id_precedence(self):
         """Test that DNS name resolution works when both parameters are provided."""

@@ -14,7 +14,7 @@ from ..decorators import common_options
 def register_machines_commands(main_group):
     """Register list machines commands with the main CLI group."""
 
-    @main_group.command('machines')
+    @main_group.command("machines")
     @common_options
     def machines_cmd(config, verbose, machine_id, dns_name, warning, critical):
         """List all machines in Microsoft Defender for Endpoint."""
@@ -35,14 +35,10 @@ def register_machines_commands(main_group):
             service = MachinesService(client, verbose_level=verbose)
 
             # Create Nagios plugin
-            plugin = NagiosPlugin(service, 'machines')
+            plugin = NagiosPlugin(service, "machines")
 
             # Execute check
-            result = plugin.check(
-                warning=warning,
-                critical=critical,
-                verbose=verbose
-            )
+            result = plugin.check(warning=warning, critical=critical, verbose=verbose)
 
             sys.exit(result or 0)
 

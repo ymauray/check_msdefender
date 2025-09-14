@@ -11,11 +11,12 @@ from check_msdefender.services.detail_service import DetailService
 from check_msdefender.core.nagios import NagiosPlugin
 from ..decorators import common_options
 
+
 def register_detail_commands(main_group):
     """Register detail commands with the main CLI group."""
 
-    @main_group.command('detail')
-    @click.option('-i', '--id', 'machine_id_alt', help='Machine ID (GUID)')
+    @main_group.command("detail")
+    @click.option("-i", "--id", "machine_id_alt", help="Machine ID (GUID)")
     @common_options
     def detail_cmd(config, verbose, machine_id, dns_name, warning, critical, machine_id_alt):
         """Get detailed machine information from Microsoft Defender."""
@@ -33,7 +34,7 @@ def register_detail_commands(main_group):
             service = DetailService(client, verbose_level=verbose)
 
             # Create custom Nagios plugin for detail output
-            plugin = NagiosPlugin(service, 'detail')
+            plugin = NagiosPlugin(service, "detail")
 
             # Use -i option if provided, otherwise fallback to -m
             final_machine_id = machine_id_alt or machine_id
@@ -53,7 +54,7 @@ def register_detail_commands(main_group):
                 dns_name=dns_name,
                 warning=warning,
                 critical=critical,
-                verbose=verbose
+                verbose=verbose,
             )
 
             sys.exit(result)

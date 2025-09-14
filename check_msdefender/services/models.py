@@ -8,6 +8,7 @@ from enum import Enum
 
 class OnboardingStatus(Enum):
     """Onboarding status enumeration."""
+
     ONBOARDED = 0
     INSUFFICIENT_INFO = 1
     UNKNOWN = 2
@@ -16,6 +17,7 @@ class OnboardingStatus(Enum):
 @dataclass
 class Machine:
     """Machine data model."""
+
     id: str
     computer_dns_name: str
     last_seen: Optional[datetime] = None
@@ -25,6 +27,7 @@ class Machine:
 @dataclass
 class Vulnerability:
     """Vulnerability data model."""
+
     id: str
     severity: str
     title: str
@@ -34,15 +37,13 @@ class Vulnerability:
 @dataclass
 class VulnerabilityScore:
     """Vulnerability score calculation."""
+
     critical: int = 0
     high: int = 0
     medium: int = 0
     low: int = 0
-    
+
     @property
     def total_score(self) -> int:
         """Calculate total weighted score."""
-        return (self.critical * 100 + 
-                self.high * 10 + 
-                self.medium * 5 + 
-                self.low * 1)
+        return self.critical * 100 + self.high * 10 + self.medium * 5 + self.low * 1

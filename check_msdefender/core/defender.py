@@ -5,13 +5,15 @@ import requests
 from check_msdefender.core.exceptions import DefenderAPIError
 from check_msdefender.core.logging_config import get_verbose_logger
 
+
 class DefenderClient:
     """Client for Microsoft Defender API."""
-    application_json = 'application/json'
+
+    application_json = "application/json"
 
     def __init__(self, authenticator, timeout=5, region="eu3", verbose_level=0):
         """Initialize with authenticator and optional region.
-        
+
         Args:
             authenticator: Authentication provider
             timeout: Request timeout in seconds
@@ -23,43 +25,40 @@ class DefenderClient:
         self.region = region
         self.base_url = self._get_base_url(region)
         self.logger = get_verbose_logger(__name__, verbose_level)
-    
+
     def _get_base_url(self, region):
         """Get base URL for the specified region."""
         endpoints = {
             "eu": "https://api-eu.securitycenter.microsoft.com",
-            "eu3": "https://api-eu3.securitycenter.microsoft.com", 
+            "eu3": "https://api-eu3.securitycenter.microsoft.com",
             "us": "https://api.securitycenter.microsoft.com",
-            "uk": "https://api-uk.securitycenter.microsoft.com"
+            "uk": "https://api-uk.securitycenter.microsoft.com",
         }
         return endpoints.get(region, endpoints["eu3"])
-    
+
     def get_machine_by_dns_name(self, dns_name):
         """Get machine information by DNS name."""
         self.logger.method_entry("get_machine_by_dns_name", dns_name=dns_name)
-        
+
         token = self._get_token()
-        
+
         url = f"{self.base_url}/api/machines"
         headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': DefenderClient.application_json
+            "Authorization": f"Bearer {token}",
+            "Content-Type": DefenderClient.application_json,
         }
-        
-        params = {
-            '$filter': f"computerDnsName eq '{dns_name}'",
-            '$select': 'id'
-        }
-        
+
+        params = {"$filter": f"computerDnsName eq '{dns_name}'", "$select": "id"}
+
         try:
             start_time = time.time()
             self.logger.info(f"Querying machine by DNS name: {dns_name}")
             response = requests.get(url, headers=headers, params=params, timeout=self.timeout)
             elapsed = time.time() - start_time
-            
+
             self.logger.api_call("GET", url, response.status_code, elapsed)
             response.raise_for_status()
-            
+
             result = response.json()
             self.logger.json_response(str(result))
             self.logger.method_exit("get_machine_by_dns_name", result)
@@ -77,8 +76,8 @@ class DefenderClient:
 
         url = f"{self.base_url}/api/machines/{machine_id}"
         headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': DefenderClient.application_json
+            "Authorization": f"Bearer {token}",
+            "Content-Type": DefenderClient.application_json,
         }
 
         try:
@@ -102,24 +101,24 @@ class DefenderClient:
     def get_machine_vulnerabilities(self, machine_id):
         """Get vulnerabilities for a machine."""
         self.logger.method_entry("get_machine_vulnerabilities", machine_id=machine_id)
-        
+
         token = self._get_token()
-        
+
         url = f"{self.base_url}/api/machines/{machine_id}/vulnerabilities"
         headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': DefenderClient.application_json
+            "Authorization": f"Bearer {token}",
+            "Content-Type": DefenderClient.application_json,
         }
-        
+
         try:
             start_time = time.time()
             self.logger.info(f"Querying vulnerabilities for machine: {machine_id}")
             response = requests.get(url, headers=headers, timeout=self.timeout)
             elapsed = time.time() - start_time
-            
+
             self.logger.api_call("GET", url, response.status_code, elapsed)
             response.raise_for_status()
-            
+
             result = response.json()
             self.logger.json_response(str(result))
             self.logger.method_exit("get_machine_vulnerabilities", result)
@@ -128,7 +127,7 @@ class DefenderClient:
             self.logger.debug(f"API request failed: {str(e)}")
             self.logger.debug(f"Response: {str(e.response.content)}")
             raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
-    
+
     def list_machines(self):
         """Get list of all machines."""
         self.logger.method_entry("list_machines")
@@ -137,13 +136,11 @@ class DefenderClient:
 
         url = f"{self.base_url}/api/machines"
         headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': DefenderClient.application_json
+            "Authorization": f"Bearer {token}",
+            "Content-Type": DefenderClient.application_json,
         }
 
-        params = {
-            '$select': 'id,computerDnsName,onboardingStatus,osPlatform'
-        }
+        params = {"$select": "id,computerDnsName,onboardingStatus,osPlatform"}
 
         try:
             start_time = time.time()

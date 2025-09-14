@@ -20,16 +20,13 @@ class MachinesService:
         self.logger.info("Fetching all machines from Defender API")
         machines_data = self.defender.list_machines()
 
-        if not machines_data.get('value'):
+        if not machines_data.get("value"):
             self.logger.info("No machines found")
-            result = {
-                'value': 0,
-                'details': ["No machines found in Microsoft Defender"]
-            }
+            result = {"value": 0, "details": ["No machines found in Microsoft Defender"]}
             self.logger.method_exit("get_result", result)
             return result
 
-        machines = machines_data['value']
+        machines = machines_data["value"]
         machine_count = len(machines)
 
         # Create detailed output
@@ -37,22 +34,19 @@ class MachinesService:
 
         # Liat machines
         # Define the sort order
-        status_priority = {
-            'Onboarded': 1,
-            'InsufficientInfo': 2,
-            'Unsupported': 3
-        }
+        status_priority = {"Onboarded": 1, "InsufficientInfo": 2, "Unsupported": 3}
 
         # Sort by priority
-        sorted_machines = sorted(machines, key=lambda x: (status_priority[x['onboardingStatus']], x['computerDnsName']))
+        sorted_machines = sorted(
+            machines, key=lambda x: (status_priority[x["onboardingStatus"]], x["computerDnsName"])
+        )
         for machine in sorted_machines:
-            onboarded = "✓" if machine['onboardingStatus'] == "Onboarded" else "✗"
-            details.append(f"{machine['id']}: {machine['computerDnsName']} ({machine['osPlatform']}) {onboarded}")
+            onboarded = "✓" if machine["onboardingStatus"] == "Onboarded" else "✗"
+            details.append(
+                f"{machine['id']}: {machine['computerDnsName']} ({machine['osPlatform']}) {onboarded}"
+            )
 
-        result = {
-            'value': machine_count,
-            'details': details
-        }
+        result = {"value": machine_count, "details": details}
 
         self.logger.info(f"Found {machine_count} machines")
         self.logger.method_exit("get_result", result)
@@ -66,19 +60,19 @@ class MachinesService:
         self.logger.info("Fetching all machines from Defender API")
         machines_data = self.defender.list_machines()
 
-        if not machines_data.get('value'):
+        if not machines_data.get("value"):
             self.logger.info("No machines found")
             self.logger.method_exit("get_details", [])
             return []
 
-        machines = machines_data['value']
+        machines = machines_data["value"]
         details = []
 
         for machine in machines:
-            machine_id = machine.get('id', 'unknown')[:10]  # Truncate ID for display
-            dns_name = machine.get('computerDnsName', 'unknown')
-            status = machine.get('onboardingStatus', 'unknown')
-            platform = machine.get('osPlatform', 'unknown')
+            machine_id = machine.get("id", "unknown")[:10]  # Truncate ID for display
+            dns_name = machine.get("computerDnsName", "unknown")
+            status = machine.get("onboardingStatus", "unknown")
+            platform = machine.get("osPlatform", "unknown")
 
             details.append(f"{machine_id} {dns_name} {status} {platform}")
 

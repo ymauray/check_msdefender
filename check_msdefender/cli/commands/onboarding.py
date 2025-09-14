@@ -14,7 +14,7 @@ from ..decorators import common_options
 def register_onboarding_commands(main_group):
     """Register onboarding status commands with the main CLI group."""
 
-    @main_group.command('onboarding')
+    @main_group.command("onboarding")
     @common_options
     def onboarding_cmd(config, verbose, machine_id, dns_name, warning, critical):
         """Check onboarding status for Microsoft Defender (alias)."""
@@ -35,7 +35,7 @@ def register_onboarding_commands(main_group):
             service = OnboardingService(client, verbose_level=verbose)
 
             # Create Nagios plugin
-            plugin = NagiosPlugin(service, 'onboarding')
+            plugin = NagiosPlugin(service, "onboarding")
 
             # Execute check
             result = plugin.check(
@@ -43,7 +43,7 @@ def register_onboarding_commands(main_group):
                 dns_name=dns_name,
                 warning=warning,
                 critical=critical,
-                verbose=verbose
+                verbose=verbose,
             )
 
             sys.exit(result or 0)

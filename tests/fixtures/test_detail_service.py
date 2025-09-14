@@ -81,9 +81,18 @@ class TestDetailServiceFixtures:
 
         # Verify all expected fields from the documentation are present
         expected_fields = [
-            "id", "computerDnsName", "lastSeen", "osPlatform", "version",
-            "osProcessor", "lastIpAddress", "lastExternalIpAddress",
-            "healthStatus", "deviceValue", "rbacGroupId", "riskScore"
+            "id",
+            "computerDnsName",
+            "lastSeen",
+            "osPlatform",
+            "version",
+            "osProcessor",
+            "lastIpAddress",
+            "lastExternalIpAddress",
+            "healthStatus",
+            "deviceValue",
+            "rbacGroupId",
+            "riskScore",
         ]
 
         for field in expected_fields:

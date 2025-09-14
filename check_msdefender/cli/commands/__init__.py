@@ -6,6 +6,7 @@ from .onboarding import register_onboarding_commands
 from .machines import register_machines_commands
 from .detail import register_detail_commands
 
+
 def register_all_commands(main_group):
     """Register all commands with the main CLI group."""
     register_lastseen_commands(main_group)

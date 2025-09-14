@@ -13,8 +13,8 @@ from ..decorators import common_options
 
 def register_vulnerability_commands(main_group):
     """Register vulnerability commands with the main CLI group."""
-    
-    @main_group.command('vulnerabilities')
+
+    @main_group.command("vulnerabilities")
     @common_options
     def vulnerabilities_cmd(config, verbose, machine_id, dns_name, warning, critical):
         """Check vulnerability score for Microsoft Defender."""
@@ -35,7 +35,7 @@ def register_vulnerability_commands(main_group):
             service = VulnerabilitiesService(client, verbose_level=verbose)
 
             # Create Nagios plugin
-            plugin = NagiosPlugin(service, 'vulnerabilities')
+            plugin = NagiosPlugin(service, "vulnerabilities")
 
             # Execute check
             result = plugin.check(
@@ -43,7 +43,7 @@ def register_vulnerability_commands(main_group):
                 dns_name=dns_name,
                 warning=warning,
                 critical=critical,
-                verbose=verbose
+                verbose=verbose,
             )
 
             sys.exit(result or 0)

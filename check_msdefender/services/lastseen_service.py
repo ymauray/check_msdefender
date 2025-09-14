@@ -8,12 +8,12 @@ from check_msdefender.core.logging_config import get_verbose_logger
 
 class LastSeenService:
     """Service for checking last seen status."""
-    
+
     def __init__(self, defender_client, verbose_level=0):
         """Initialize with Defender client."""
         self.defender = defender_client
         self.logger = get_verbose_logger(__name__, verbose_level)
-    
+
     def get_result(self, machine_id=None, dns_name=None):
         """Get last seen result with value and details for a machine."""
         self.logger.method_entry("get_result", machine_id=machine_id, dns_name=dns_name)
@@ -25,15 +25,15 @@ class LastSeenService:
         if dns_name:
             self.logger.info(f"Fetching machine data by DNS name: {dns_name}")
             machines_data = self.defender.get_machine_by_dns_name(dns_name)
-            if not machines_data.get('value'):
+            if not machines_data.get("value"):
                 raise ValidationError(f"Machine not found with DNS name: {dns_name}")
-            machine_data = machines_data['value'][0]
+            machine_data = machines_data["value"][0]
             self.logger.debug(f"Found machine: {machine_data.get('id', 'unknown')}")
-            machine_id = machine_data.get('id')
+            machine_id = machine_data.get("id")
 
         # Extract last seen timestamp
         machine_details = self.defender.get_machine_by_id(machine_id)
-        last_seen_str = machine_details.get('lastSeen')
+        last_seen_str = machine_details.get("lastSeen")
         if not last_seen_str:
             raise ValidationError("No lastSeen data available for machine")
 
@@ -42,23 +42,22 @@ class LastSeenService:
         # Parse timestamp and calculate days difference
         try:
             # Handle high-precision microseconds by truncating to 6 digits
-            timestamp_str = last_seen_str.replace('Z', '+00:00')
+            timestamp_str = last_seen_str.replace("Z", "+00:00")
             # Regex to find and truncate microseconds longer than 6 digits
-            timestamp_str = re.sub(r'\.(\d{6})\d+', r'.\1', timestamp_str)
+            timestamp_str = re.sub(r"\.(\d{6})\d+", r".\1", timestamp_str)
 
             last_seen = datetime.fromisoformat(timestamp_str)
             now = datetime.now(last_seen.tzinfo)
             days_diff = (now - last_seen).days
 
             # Create detailed output
-            computer_name = machine_details.get('computerDnsName', 'Unknown')
-            last_seen_formatted = last_seen.strftime('%Y-%m-%d %H:%M:%S %Z')
-            details = [f"Machine: {computer_name} - Last seen {days_diff} days ago ({last_seen_formatted})"]
+            computer_name = machine_details.get("computerDnsName", "Unknown")
+            last_seen_formatted = last_seen.strftime("%Y-%m-%d %H:%M:%S %Z")
+            details = [
+                f"Machine: {computer_name} - Last seen {days_diff} days ago ({last_seen_formatted})"
+            ]
 
-            result = {
-                'value': days_diff,
-                'details': details
-            }
+            result = {"value": days_diff, "details": details}
 
             self.logger.info(f"Machine last seen {days_diff} days ago ({last_seen_str})")
             self.logger.method_exit("get_result", result)

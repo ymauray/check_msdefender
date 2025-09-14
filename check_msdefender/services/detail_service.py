@@ -29,17 +29,17 @@ class DetailService:
             if dns_name:
                 self.logger.info(f"Fetching machine data by DNS name: {dns_name}")
                 machines_data = self.defender.get_machine_by_dns_name(dns_name)
-                if not machines_data.get('value'):
+                if not machines_data.get("value"):
                     self.logger.info(f"Machine not found with DNS name: {dns_name}")
                     result = {
-                        'value': 0,
-                        'details': [f"Machine not found with DNS name: {dns_name}"]
+                        "value": 0,
+                        "details": [f"Machine not found with DNS name: {dns_name}"],
                     }
                     self.logger.method_exit("get_result", result)
                     return result
-                machine_data = machines_data['value'][0]
+                machine_data = machines_data["value"][0]
                 self.logger.debug(f"Found machine: {machine_data.get('id', 'unknown')}")
-                machine_id = machine_data.get('id')
+                machine_id = machine_data.get("id")
 
             # Get detailed machine information by ID
             self.logger.info(f"Fetching detailed machine data by ID: {machine_id}")
@@ -57,10 +57,7 @@ class DetailService:
             details.append(f"Health Status: {machine_details.get('healthStatus', 'Unknown')}")
             details.append(f"Risk Score: {machine_details.get('riskScore', 'Unknown')}")
 
-            result = {
-                'value': 1,
-                'details': details
-            }
+            result = {"value": 1, "details": details}
 
             self.logger.info(f"Machine details retrieved successfully")
             self.logger.method_exit("get_result", result)
@@ -72,6 +69,6 @@ class DetailService:
 
     def get_machine_details_json(self):
         """Get the machine details as formatted JSON string."""
-        if not hasattr(self, '_machine_details'):
+        if not hasattr(self, "_machine_details"):
             return None
         return json.dumps(self._machine_details, indent=2)

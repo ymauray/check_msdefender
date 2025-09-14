@@ -13,8 +13,8 @@ from ..decorators import common_options
 
 def register_lastseen_commands(main_group):
     """Register last seen commands with the main CLI group."""
-    
-    @main_group.command('lastseen')
+
+    @main_group.command("lastseen")
     @common_options
     def lastseen_cmd(config, verbose, machine_id, dns_name, warning, critical):
         """Check days since last seen for Microsoft Defender."""
@@ -35,7 +35,7 @@ def register_lastseen_commands(main_group):
             service = LastSeenService(client, verbose_level=verbose)
 
             # Create Nagios plugin
-            plugin = NagiosPlugin(service, 'lastseen')
+            plugin = NagiosPlugin(service, "lastseen")
 
             # Execute check
             result = plugin.check(
@@ -43,7 +43,7 @@ def register_lastseen_commands(main_group):
                 dns_name=dns_name,
                 warning=warning,
                 critical=critical,
-                verbose=verbose
+                verbose=verbose,
             )
 
             sys.exit(result or 0)
