@@ -9,7 +9,7 @@ A comprehensive **Nagios plugin** for monitoring Microsoft Defender for Endpoint
 ## ✨ Features
 
 - 🔐 **Dual Authentication** - Support for Client Secret and Certificate-based authentication
-- 🎯 **Multiple Endpoints** - Monitor onboarding status, last seen, vulnerabilities, and machine details
+- 🎯 **Multiple Endpoints** - Monitor onboarding status, last seen, vulnerabilities, alerts, and machine details
 - 📊 **Nagios Compatible** - Standard exit codes and performance data output
 - 🏗️ **Clean Architecture** - Modular design with testable components
 - 🔧 **Flexible Configuration** - File-based configuration with sensible defaults
@@ -41,6 +41,9 @@ check_msdefender lastseen -d machine.domain.tld -W 7 -C 30
 # Check vulnerabilities
 check_msdefender vulnerabilities -d machine.domain.tld -W 10 -C 100
 
+# Check alerts
+check_msdefender alerts -d machine.domain.tld -W 1 -C 5
+
 # List all machines
 check_msdefender machines
 
@@ -55,6 +58,7 @@ check_msdefender detail -d machine.domain.tld
 | `onboarding` | Check machine onboarding status | W:1, C:2 |
 | `lastseen` | Days since machine last seen | W:7, C:30 |
 | `vulnerabilities` | Vulnerability score calculation | W:10, C:100 |
+| `alerts` | Count of unresolved alerts | W:1, C:0 |
 | `machines` | List all machines | W:10, C:25 |
 | `detail` | Get detailed machine information | - |
 
@@ -65,6 +69,14 @@ The vulnerability score is calculated as:
 - **High vulnerabilities** × 10
 - **Medium vulnerabilities** × 5
 - **Low vulnerabilities** × 1
+
+### Alert Monitoring
+
+The alerts command monitors unresolved security alerts for a machine:
+- **Counts only unresolved alerts** (status ≠ "Resolved")
+- **Excludes informational alerts** when critical/warning alerts exist
+- **Shows alert details** including creation time, title, and severity
+- **Default thresholds**: Warning at 1 alert, Critical at 0 (meaning any alert triggers warning)
 
 ### Onboarding Status Values
 
@@ -108,6 +120,7 @@ timeout = 5
    - `Machine.Read.All`
    - `Vulnerability.Read`
    - `Vulnerability.Read.All`
+   - `Alert.Read.All`
 3. **Create Authentication** (Secret or Certificate)
 4. **Note Credentials** (Client ID, Tenant ID, Secret/Certificate)
 
@@ -145,6 +158,11 @@ define command {
     command_name    check_defender_vulnerabilities
     command_line    $USER1$/check_msdefender/bin/check_msdefender vulnerabilities -d $HOSTALIAS$ -W 10 -C 100
 }
+
+define command {
+    command_name    check_defender_alerts
+    command_line    $USER1$/check_msdefender/bin/check_msdefender alerts -d $HOSTALIAS$ -W 1 -C 5
+}
 ```
 
 ### Service Definitions
@@ -171,6 +189,13 @@ define service {
     check_command           check_defender_vulnerabilities
     hostgroup_name          msdefender
 }
+
+define service {
+    use                     generic-service
+    service_description     DEFENDER_ALERTS
+    check_command           check_defender_alerts
+    hostgroup_name          msdefender
+}
 ```
 
 ## 🏗️ Architecture
@@ -184,6 +209,7 @@ check_msdefender/
 │   │   ├── onboarding.py      # Onboarding status command
 │   │   ├── lastseen.py        # Last seen command
 │   │   ├── vulnerabilities.py # Vulnerabilities command
+│   │   ├── alerts.py          # Alerts monitoring command
 │   │   ├── machines.py        # List machines command
 │   │   └── detail.py          # Machine detail command
 │   ├── decorators.py          # Common CLI decorators
@@ -199,6 +225,7 @@ check_msdefender/
 │   ├── onboarding_service.py  # Onboarding business logic
 │   ├── lastseen_service.py    # Last seen business logic
 │   ├── vulnerabilities_service.py # Vulnerability business logic
+│   ├── alerts_service.py      # Alerts monitoring business logic
 │   ├── machines_service.py    # Machines business logic
 │   ├── detail_service.py      # Detail business logic
 │   └── models.py              # Data models
@@ -278,6 +305,14 @@ DEFENDER WARNING - Last seen: 10 days ago | lastseen=10;7;30;0;
 ### Critical State
 ```
 DEFENDER CRITICAL - Vulnerability score: 150 (1 Critical, 5 High) | vulnerabilities=150;10;100;0;
+```
+
+### Alerts Warning
+```
+DEFENDER WARNING - Unresolved alerts for machine.domain.com | alerts=2;1;5;0;
+Unresolved alerts for machine.domain.com
+2025-09-14T10:22:14.12Z - Suspicious activity detected (New high)
+2025-09-14T12:00:00.00Z - Malware detection (InProgress medium)
 ```
 
 ## 🔧 Troubleshooting
