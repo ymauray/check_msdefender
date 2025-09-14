@@ -12,7 +12,9 @@ class DefenderClient:
 
     application_json = "application/json"
 
-    def __init__(self, authenticator: Any, timeout: int = 5, region: str = "eu3", verbose_level: int = 0) -> None:
+    def __init__(
+        self, authenticator: Any, timeout: int = 5, region: str = "eu3", verbose_level: int = 0
+    ) -> None:
         """Initialize with authenticator and optional region.
 
         Args:
@@ -66,7 +68,7 @@ class DefenderClient:
             return result
         except requests.RequestException as e:
             self.logger.debug(f"API request failed: {str(e)}")
-            if hasattr(e, 'response') and e.response is not None:
+            if hasattr(e, "response") and e.response is not None:
                 self.logger.debug(f"Response: {str(e.response.content)}")
             raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
 
@@ -97,7 +99,7 @@ class DefenderClient:
             return result
         except requests.RequestException as e:
             self.logger.debug(f"API request failed: {str(e)}")
-            if hasattr(e, 'response') and e.response is not None:
+            if hasattr(e, "response") and e.response is not None:
                 self.logger.debug(f"Response: {str(e.response.content)}")
             raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
 
@@ -128,7 +130,7 @@ class DefenderClient:
             return result
         except requests.RequestException as e:
             self.logger.debug(f"API request failed: {str(e)}")
-            if hasattr(e, 'response') and e.response is not None:
+            if hasattr(e, "response") and e.response is not None:
                 self.logger.debug(f"Response: {str(e.response.content)}")
             raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
 
@@ -161,7 +163,7 @@ class DefenderClient:
             return result
         except requests.RequestException as e:
             self.logger.debug(f"API request failed: {str(e)}")
-            if hasattr(e, 'response') and e.response is not None:
+            if hasattr(e, "response") and e.response is not None:
                 self.logger.debug(f"Response: {str(e.response.content)}")
             raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
 

@@ -18,7 +18,15 @@ def register_detail_commands(main_group: Any) -> None:
     @main_group.command("detail")
     @click.option("-i", "--id", "machine_id_alt", help="Machine ID (GUID)")
     @common_options
-    def detail_cmd(config: str, verbose: int, machine_id: Optional[str], dns_name: Optional[str], warning: Optional[float], critical: Optional[float], machine_id_alt: Optional[str]) -> None:
+    def detail_cmd(
+        config: str,
+        verbose: int,
+        machine_id: Optional[str],
+        dns_name: Optional[str],
+        warning: Optional[float],
+        critical: Optional[float],
+        machine_id_alt: Optional[str],
+    ) -> None:
         """Get detailed machine information from Microsoft Defender."""
         try:
             # Load configuration

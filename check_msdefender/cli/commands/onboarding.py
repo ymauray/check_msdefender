@@ -17,7 +17,14 @@ def register_onboarding_commands(main_group: Any) -> None:
 
     @main_group.command("onboarding")
     @common_options
-    def onboarding_cmd(config: str, verbose: int, machine_id: Optional[str], dns_name: Optional[str], warning: Optional[float], critical: Optional[float]) -> None:
+    def onboarding_cmd(
+        config: str,
+        verbose: int,
+        machine_id: Optional[str],
+        dns_name: Optional[str],
+        warning: Optional[float],
+        critical: Optional[float],
+    ) -> None:
         """Check onboarding status for Microsoft Defender (alias)."""
         warning = warning if warning is not None else 1
         critical = critical if critical is not None else 2

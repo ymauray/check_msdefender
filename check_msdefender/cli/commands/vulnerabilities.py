@@ -17,7 +17,14 @@ def register_vulnerability_commands(main_group: Any) -> None:
 
     @main_group.command("vulnerabilities")
     @common_options
-    def vulnerabilities_cmd(config: str, verbose: int, machine_id: Optional[str], dns_name: Optional[str], warning: Optional[float], critical: Optional[float]) -> None:
+    def vulnerabilities_cmd(
+        config: str,
+        verbose: int,
+        machine_id: Optional[str],
+        dns_name: Optional[str],
+        warning: Optional[float],
+        critical: Optional[float],
+    ) -> None:
         """Check vulnerability score for Microsoft Defender."""
         warning = warning if warning is not None else 10
         critical = critical if critical is not None else 100

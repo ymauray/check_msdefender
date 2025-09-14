@@ -14,7 +14,9 @@ class DetailService:
         self.defender = defender_client
         self.logger = get_verbose_logger(__name__, verbose_level)
 
-    def get_result(self, machine_id: Optional[str] = None, dns_name: Optional[str] = None) -> Dict[str, Any]:
+    def get_result(
+        self, machine_id: Optional[str] = None, dns_name: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Get machine details result with value and details.
 
         Returns:

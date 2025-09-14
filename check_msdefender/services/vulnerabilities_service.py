@@ -15,7 +15,9 @@ class VulnerabilitiesService:
         self.logger = get_verbose_logger(__name__, verbose_level)
         self._severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 
-    def get_result(self, machine_id: Optional[str] = None, dns_name: Optional[str] = None) -> Dict[str, Any]:
+    def get_result(
+        self, machine_id: Optional[str] = None, dns_name: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Get vulnerability result with value and details for a machine."""
         self.logger.method_entry("get_result", machine_id=machine_id, dns_name=dns_name)
 
@@ -81,7 +83,9 @@ class VulnerabilitiesService:
         self.logger.method_exit("get_result", result)
         return result
 
-    def clean_and_truncate(self, text: Optional[str], prefix: str = "Summary: ", word_count: int = 10) -> str:
+    def clean_and_truncate(
+        self, text: Optional[str], prefix: str = "Summary: ", word_count: int = 10
+    ) -> str:
         # Handle None text
         if text is None:
             return ""
@@ -90,7 +94,9 @@ class VulnerabilitiesService:
         words = cleaned.split()[:word_count]
         return " ".join(words)
 
-    def get_detailed_vulnerabilities(self, machine_id: Optional[str] = None, dns_name: Optional[str] = None) -> List[Vulnerability]:
+    def get_detailed_vulnerabilities(
+        self, machine_id: Optional[str] = None, dns_name: Optional[str] = None
+    ) -> List[Vulnerability]:
         """Get detailed vulnerability information for a machine."""
         self.logger.method_entry(
             "get_detailed_vulnerabilities", machine_id=machine_id, dns_name=dns_name
@@ -122,7 +128,9 @@ class VulnerabilitiesService:
         self.logger.method_exit("get_detailed_vulnerabilities", len(sorted_vulnerabilities))
         return sorted_vulnerabilities
 
-    def _process_vulnerabilities(self, raw_vulnerabilities: List[Dict[str, Any]]) -> List[Vulnerability]:
+    def _process_vulnerabilities(
+        self, raw_vulnerabilities: List[Dict[str, Any]]
+    ) -> List[Vulnerability]:
         """Process and deduplicate vulnerabilities."""
         seen_cves = set()
         unique_vulnerabilities = []

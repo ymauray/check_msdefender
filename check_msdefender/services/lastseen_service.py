@@ -15,7 +15,9 @@ class LastSeenService:
         self.defender = defender_client
         self.logger = get_verbose_logger(__name__, verbose_level)
 
-    def get_result(self, machine_id: Optional[str] = None, dns_name: Optional[str] = None) -> Dict[str, Any]:
+    def get_result(
+        self, machine_id: Optional[str] = None, dns_name: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Get last seen result with value and details for a machine."""
         self.logger.method_entry("get_result", machine_id=machine_id, dns_name=dns_name)
 

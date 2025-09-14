@@ -17,7 +17,14 @@ def register_lastseen_commands(main_group: Any) -> None:
 
     @main_group.command("lastseen")
     @common_options
-    def lastseen_cmd(config: str, verbose: int, machine_id: Optional[str], dns_name: Optional[str], warning: Optional[float], critical: Optional[float]) -> None:
+    def lastseen_cmd(
+        config: str,
+        verbose: int,
+        machine_id: Optional[str],
+        dns_name: Optional[str],
+        warning: Optional[float],
+        critical: Optional[float],
+    ) -> None:
         """Check days since last seen for Microsoft Defender."""
         warning = warning if warning is not None else 7
         critical = critical if critical is not None else 30

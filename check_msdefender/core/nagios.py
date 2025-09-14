@@ -7,14 +7,21 @@ from typing import List, Optional, Union, Any
 class DefenderScalarContext(nagiosplugin.ScalarContext):
     """Custom scalar context with modified threshold logic for detail command."""
 
-    def __init__(self, name: str, warning: Optional[Union[float, int]] = None, critical: Optional[Union[float, int]] = None) -> None:
+    def __init__(
+        self,
+        name: str,
+        warning: Optional[Union[float, int]] = None,
+        critical: Optional[Union[float, int]] = None,
+    ) -> None:
         """Initialize with custom threshold logic."""
         # Store original values to know what was actually set
         self._original_warning = warning
         self._original_critical = critical
         super().__init__(name, warning, critical)
 
-    def evaluate(self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource) -> nagiosplugin.Result:
+    def evaluate(
+        self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource
+    ) -> nagiosplugin.Result:
         """Evaluate metric against thresholds with <= logic for detail command."""
         if self.name == "found":
             # For detail command, use <= threshold logic (not < threshold)
@@ -105,7 +112,14 @@ class NagiosPlugin:
         self.service = service
         self.command_name = command_name
 
-    def check(self, machine_id: Optional[str] = None, dns_name: Optional[str] = None, warning: Optional[Union[float, int]] = None, critical: Optional[Union[float, int]] = None, verbose: int = 0) -> int:
+    def check(
+        self,
+        machine_id: Optional[str] = None,
+        dns_name: Optional[str] = None,
+        warning: Optional[Union[float, int]] = None,
+        critical: Optional[Union[float, int]] = None,
+        verbose: int = 0,
+    ) -> int:
         """Execute the check and return Nagios exit code."""
         try:
             result = self.service.get_result(machine_id=machine_id, dns_name=dns_name)
