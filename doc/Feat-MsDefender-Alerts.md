@@ -13,14 +13,14 @@ Get detailed machine alerts from Microsoft Defender.
 ### Command Structure
 ```bash
 check_msdefender alerts -i <machine_id>
-check_msdefender alerts -d <dns_name> [-W <warning>] [-C <critical>]
+check_msdefender alerts -d <dns_name>
 ```
 
 ### Service Class: `AlertsService`
 Location: `check_msdefender/services/alerts_service.py`
 
 **Methods:**
-- `get_value(machine_id=None, dns_name=None)` - Returns machine details dict
+- `get_alerts(machine_id=None, dns_name=None)` - Returns machine alerts
 - Inherits from base service pattern like `LastSeenService`
 
 ### CLI Command: `alerts`
@@ -36,9 +36,9 @@ Location: `check_msdefender/core/defender.py`
 - `get_alerts()`
 - Returns full alerts details JSON
 
-https://api-eu3.securitycenter.microsoft.com/api/alerts?$top=100&$expand=evidence&$orderby=alertCreationTime desc&$select=status,title,machineId,computerDnsName,alertCreationTime,firstEventTime,lastEventTime,lastUpdateTime
+https://api.securitycenter.microsoft.com/api/alerts?$top=100&$expand=evidence&$orderby=alertCreationTime desc&$select=status,title,machineId,computerDnsName,alertCreationTime,firstEventTime,lastEventTime,lastUpdateTime
 
-https://api-eu3.securitycenter.microsoft.com
+https://api.securitycenter.microsoft.com
 /api/alerts
 $top=100
 $expand=evidence
@@ -80,14 +80,14 @@ $select=status,title,machineId,computerDnsName,alertCreationTime,firstEventTime,
 ### Success (Machine Found)
 ```
 DEFENDER WARNING - Unresolved informational alerts for machine.domain.tld | alerts=3;0;0
-2025-09-12T21:22:14.12Z - Automated investigation started manually (New informationnal)
+2025-09-12T21:22:14.12Z - Automated investigation started manually (New informational)
 alertCreationTime - Alert title (status severity)
 alertCreationTime - Alert title (status severity)
 ```
 
 ### Failure States
-- **Warning**: `DEFENDER WARNING - Machine not found | alerts=0;0;1` (when warning=0)
-- **Critical**: `DEFENDER CRITICAL - Machine not found | alerts=0;1;0` (when critical=0)
+- **Warning**: `DEFENDER WARNING - Unresolved informational alerts | alerts=0;0;1` 
+- **Critical**: `DEFENDER CRITICAL - Unresolved alerts | alerts=0;1;0`
 - **Unknown**: `DEFENDER UNKNOWN - API error: <message>` (API failures)
 
 ## Nagios Integration
