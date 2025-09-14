@@ -3,9 +3,10 @@
 import configparser
 import os
 from pathlib import Path
+from typing import Optional
 
 
-def load_config(config_path="check_msdefender.ini"):
+def load_config(config_path: str = "check_msdefender.ini") -> configparser.ConfigParser:
     """Load configuration from file."""
     config = configparser.ConfigParser()
 
@@ -19,7 +20,7 @@ def load_config(config_path="check_msdefender.ini"):
     return config
 
 
-def _find_config_file(config_path):
+def _find_config_file(config_path: str) -> Optional[str]:
     """Find configuration file in current directory or Nagios base directory."""
     # If absolute path provided, use it
     if os.path.isabs(config_path):

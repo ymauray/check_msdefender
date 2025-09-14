@@ -2,7 +2,7 @@
 
 import sys
 import click
-import nagiosplugin
+from typing import Optional, Any
 
 from check_msdefender.core.auth import get_authenticator
 from check_msdefender.core.config import load_config
@@ -12,13 +12,13 @@ from check_msdefender.core.nagios import NagiosPlugin
 from ..decorators import common_options
 
 
-def register_detail_commands(main_group):
+def register_detail_commands(main_group: Any) -> None:
     """Register detail commands with the main CLI group."""
 
     @main_group.command("detail")
     @click.option("-i", "--id", "machine_id_alt", help="Machine ID (GUID)")
     @common_options
-    def detail_cmd(config, verbose, machine_id, dns_name, warning, critical, machine_id_alt):
+    def detail_cmd(config: str, verbose: int, machine_id: Optional[str], dns_name: Optional[str], warning: Optional[float], critical: Optional[float], machine_id_alt: Optional[str]) -> None:
         """Get detailed machine information from Microsoft Defender."""
         try:
             # Load configuration

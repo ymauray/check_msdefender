@@ -1,5 +1,6 @@
 """Vulnerabilities service implementation."""
 
+from typing import Dict, List, Optional, Any
 from check_msdefender.services.models import VulnerabilityScore, Vulnerability
 from check_msdefender.core.exceptions import ValidationError
 from check_msdefender.core.logging_config import get_verbose_logger
@@ -8,13 +9,13 @@ from check_msdefender.core.logging_config import get_verbose_logger
 class VulnerabilitiesService:
     """Service for checking vulnerabilities."""
 
-    def __init__(self, defender_client, verbose_level=0):
+    def __init__(self, defender_client: Any, verbose_level: int = 0) -> None:
         """Initialize with Defender client."""
         self.client = defender_client
         self.logger = get_verbose_logger(__name__, verbose_level)
         self._severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 
-    def get_result(self, machine_id=None, dns_name=None):
+    def get_result(self, machine_id: Optional[str] = None, dns_name: Optional[str] = None) -> Dict[str, Any]:
         """Get vulnerability result with value and details for a machine."""
         self.logger.method_entry("get_result", machine_id=machine_id, dns_name=dns_name)
 
@@ -80,7 +81,7 @@ class VulnerabilitiesService:
         self.logger.method_exit("get_result", result)
         return result
 
-    def clean_and_truncate(self, text, prefix="Summary: ", word_count=10):
+    def clean_and_truncate(self, text: Optional[str], prefix: str = "Summary: ", word_count: int = 10) -> str:
         # Handle None text
         if text is None:
             return ""
@@ -89,7 +90,7 @@ class VulnerabilitiesService:
         words = cleaned.split()[:word_count]
         return " ".join(words)
 
-    def get_detailed_vulnerabilities(self, machine_id=None, dns_name=None):
+    def get_detailed_vulnerabilities(self, machine_id: Optional[str] = None, dns_name: Optional[str] = None) -> List[Vulnerability]:
         """Get detailed vulnerability information for a machine."""
         self.logger.method_entry(
             "get_detailed_vulnerabilities", machine_id=machine_id, dns_name=dns_name
@@ -121,7 +122,7 @@ class VulnerabilitiesService:
         self.logger.method_exit("get_detailed_vulnerabilities", len(sorted_vulnerabilities))
         return sorted_vulnerabilities
 
-    def _process_vulnerabilities(self, raw_vulnerabilities):
+    def _process_vulnerabilities(self, raw_vulnerabilities: List[Dict[str, Any]]) -> List[Vulnerability]:
         """Process and deduplicate vulnerabilities."""
         seen_cves = set()
         unique_vulnerabilities = []
@@ -147,7 +148,7 @@ class VulnerabilitiesService:
 
         return unique_vulnerabilities
 
-    def _sort_by_severity(self, vulnerabilities):
+    def _sort_by_severity(self, vulnerabilities: List[Vulnerability]) -> List[Vulnerability]:
         """Sort vulnerabilities by severity (Critical > High > Medium > Low)."""
         return sorted(
             vulnerabilities, key=lambda v: self._severity_order.get(v.severity.lower(), 999)

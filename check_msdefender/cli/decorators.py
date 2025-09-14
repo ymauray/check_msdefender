@@ -1,9 +1,10 @@
 """CLI decorators for check_msdefender."""
 
 import click
+from typing import Callable, Any
 
 
-def common_options(func):
+def common_options(func: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator for common CLI options."""
     func = click.option(
         "-c", "--config", default="check_msdefender.ini", help="Configuration file path"

@@ -1,5 +1,6 @@
 """Machines service implementation."""
 
+from typing import Dict, List, Any
 from check_msdefender.core.exceptions import ValidationError
 from check_msdefender.core.logging_config import get_verbose_logger
 
@@ -7,12 +8,12 @@ from check_msdefender.core.logging_config import get_verbose_logger
 class MachinesService:
     """Service for listing machines."""
 
-    def __init__(self, defender_client, verbose_level=0):
+    def __init__(self, defender_client: Any, verbose_level: int = 0) -> None:
         """Initialize with Defender client."""
         self.defender = defender_client
         self.logger = get_verbose_logger(__name__, verbose_level)
 
-    def get_result(self, **kwargs):
+    def get_result(self, **kwargs: Any) -> Dict[str, Any]:
         """Get machine count result with value and details."""
         self.logger.method_entry("get_result")
 
@@ -52,7 +53,7 @@ class MachinesService:
         self.logger.method_exit("get_result", result)
         return result
 
-    def get_details(self, **kwargs):
+    def get_details(self, **kwargs: Any) -> List[str]:
         """Get detailed machine information."""
         self.logger.method_entry("get_details")
 

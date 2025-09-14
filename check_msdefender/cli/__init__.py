@@ -6,7 +6,7 @@ from .commands import register_all_commands
 
 @click.group()
 @click.version_option()
-def main():
+def main() -> None:
     """Check Microsoft Defender API endpoints and validate values."""
     pass
 

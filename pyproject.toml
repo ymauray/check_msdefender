@@ -11,16 +11,13 @@ authors = [
 description = "A Nagios plugin for monitoring Microsoft Defender API endpoints"
 readme = "README.md"
 license = {text = "MIT"}
-requires-python = ">=3.6"
+requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: System Administrators",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -58,10 +55,10 @@ check_msdefender = "check_msdefender.cli:main"
 
 [tool.black]
 line-length = 100
-target-version = ['py36']
+target-version = ['py39']
 
 [tool.mypy]
-python_version = "3.6"
+python_version = "3.9"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true

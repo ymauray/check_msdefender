@@ -2,6 +2,7 @@
 
 import sys
 import click
+from typing import Optional, Any
 
 from check_msdefender.core.auth import get_authenticator
 from check_msdefender.core.config import load_config
@@ -11,12 +12,12 @@ from check_msdefender.services.onboarding_service import OnboardingService
 from ..decorators import common_options
 
 
-def register_onboarding_commands(main_group):
+def register_onboarding_commands(main_group: Any) -> None:
     """Register onboarding status commands with the main CLI group."""
 
     @main_group.command("onboarding")
     @common_options
-    def onboarding_cmd(config, verbose, machine_id, dns_name, warning, critical):
+    def onboarding_cmd(config: str, verbose: int, machine_id: Optional[str], dns_name: Optional[str], warning: Optional[float], critical: Optional[float]) -> None:
         """Check onboarding status for Microsoft Defender (alias)."""
         warning = warning if warning is not None else 1
         critical = critical if critical is not None else 2

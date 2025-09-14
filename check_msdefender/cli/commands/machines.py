@@ -2,6 +2,7 @@
 
 import sys
 import click
+from typing import Optional, Any
 
 from check_msdefender.core.auth import get_authenticator
 from check_msdefender.core.config import load_config
@@ -11,12 +12,12 @@ from check_msdefender.services.machines_service import MachinesService
 from ..decorators import common_options
 
 
-def register_machines_commands(main_group):
+def register_machines_commands(main_group: Any) -> None:
     """Register list machines commands with the main CLI group."""
 
     @main_group.command("machines")
     @common_options
-    def machines_cmd(config, verbose, machine_id, dns_name, warning, critical):
+    def machines_cmd(config: str, verbose: int, machine_id: Optional[str], dns_name: Optional[str], warning: Optional[float], critical: Optional[float]) -> None:
         """List all machines in Microsoft Defender for Endpoint."""
         warning = warning if warning is not None else 10
         critical = critical if critical is not None else 25

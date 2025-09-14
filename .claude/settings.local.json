@@ -9,7 +9,8 @@
       "Bash(pytest:*)",
       "Bash(python:*)",
       "Bash(find:*)",
-      "Bash(echo \"Exit code: $?\")"
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(mypy:*)"
     ],
     "deny": [],
     "ask": []

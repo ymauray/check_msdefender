@@ -1,10 +1,12 @@
 """Authentication management."""
 
+import configparser
+from typing import Union
 from azure.identity import ClientSecretCredential, CertificateCredential
 from check_msdefender.core.exceptions import ConfigurationError
 
 
-def get_authenticator(config):
+def get_authenticator(config: configparser.ConfigParser) -> Union[ClientSecretCredential, CertificateCredential]:
     """Get appropriate authenticator based on configuration."""
     if not config.has_section("auth"):
         raise ConfigurationError("Missing [auth] section in configuration")

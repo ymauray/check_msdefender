@@ -2,7 +2,7 @@
 
 import logging
 import sys
-from typing import Optional
+from typing import Optional, Any
 
 
 class VerboseLogger:
@@ -19,7 +19,7 @@ class VerboseLogger:
         self.verbose_level = verbose_level
         self._configure_logger()
 
-    def _configure_logger(self):
+    def _configure_logger(self) -> None:
         """Configure logger based on verbosity level."""
         # Clear any existing handlers
         self.logger.handlers.clear()
@@ -56,17 +56,17 @@ class VerboseLogger:
         else:
             self.logger.setLevel(logging.INFO)
 
-    def info(self, message: str, *args, **kwargs):
+    def info(self, message: str, *args: Any, **kwargs: Any) -> None:
         """Log info message if verbose >= 1."""
         if self.verbose_level >= 1:
             self.logger.info(message, *args, **kwargs)
 
-    def debug(self, message: str, *args, **kwargs):
+    def debug(self, message: str, *args: Any, **kwargs: Any) -> None:
         """Log debug message if verbose >= 2."""
         if self.verbose_level >= 2:
             self.logger.debug(message, *args, **kwargs)
 
-    def trace(self, message: str, *args, **kwargs):
+    def trace(self, message: str, *args: Any, **kwargs: Any) -> None:
         """Log trace message if verbose >= 3."""
         if self.verbose_level >= 3:
             self.logger.debug(f"TRACE: {message}", *args, **kwargs)
@@ -77,7 +77,7 @@ class VerboseLogger:
         url: str,
         status_code: Optional[int] = None,
         response_time: Optional[float] = None,
-    ):
+    ) -> None:
         """Log API call details if verbose >= 2."""
         if self.verbose_level >= 2:
             if status_code and response_time:
@@ -85,18 +85,18 @@ class VerboseLogger:
             else:
                 self.logger.debug(f"API {method} {url}")
 
-    def json_response(self, data: str):
+    def json_response(self, data: str) -> None:
         """Log JSON response if verbose >= 2."""
         if self.verbose_level >= 2:
             self.logger.debug(f"JSON Response: {data}")
 
-    def method_entry(self, method_name: str, **kwargs):
+    def method_entry(self, method_name: str, **kwargs: Any) -> None:
         """Log method entry if verbose >= 3."""
         if self.verbose_level >= 3:
             args_str = ", ".join(f"{k}={v}" for k, v in kwargs.items())
             self.logger.debug(f"TRACE: -> {method_name}({args_str})")
 
-    def method_exit(self, method_name: str, result=None):
+    def method_exit(self, method_name: str, result: Any = None) -> None:
         """Log method exit if verbose >= 3."""
         if self.verbose_level >= 3:
             result_str = f" = {result}" if result is not None else ""

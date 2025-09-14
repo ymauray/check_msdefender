@@ -2,6 +2,7 @@
 
 import sys
 import click
+from typing import Optional, Any
 
 from check_msdefender.core.auth import get_authenticator
 from check_msdefender.core.config import load_config
@@ -11,12 +12,12 @@ from check_msdefender.services.lastseen_service import LastSeenService
 from ..decorators import common_options
 
 
-def register_lastseen_commands(main_group):
+def register_lastseen_commands(main_group: Any) -> None:
     """Register last seen commands with the main CLI group."""
 
     @main_group.command("lastseen")
     @common_options
-    def lastseen_cmd(config, verbose, machine_id, dns_name, warning, critical):
+    def lastseen_cmd(config: str, verbose: int, machine_id: Optional[str], dns_name: Optional[str], warning: Optional[float], critical: Optional[float]) -> None:
         """Check days since last seen for Microsoft Defender."""
         warning = warning if warning is not None else 7
         critical = critical if critical is not None else 30

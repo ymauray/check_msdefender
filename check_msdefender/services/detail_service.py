@@ -1,6 +1,7 @@
 """Detail service implementation."""
 
 import json
+from typing import Dict, Optional, Any
 from check_msdefender.core.exceptions import ValidationError
 from check_msdefender.core.logging_config import get_verbose_logger
 
@@ -8,12 +9,12 @@ from check_msdefender.core.logging_config import get_verbose_logger
 class DetailService:
     """Service for getting machine details."""
 
-    def __init__(self, defender_client, verbose_level=0):
+    def __init__(self, defender_client: Any, verbose_level: int = 0) -> None:
         """Initialize with Defender client."""
         self.defender = defender_client
         self.logger = get_verbose_logger(__name__, verbose_level)
 
-    def get_result(self, machine_id=None, dns_name=None):
+    def get_result(self, machine_id: Optional[str] = None, dns_name: Optional[str] = None) -> Dict[str, Any]:
         """Get machine details result with value and details.
 
         Returns:
@@ -67,7 +68,7 @@ class DetailService:
             self.logger.debug(f"Failed to get machine details: {str(e)}")
             raise
 
-    def get_machine_details_json(self):
+    def get_machine_details_json(self) -> Optional[str]:
         """Get the machine details as formatted JSON string."""
         if not hasattr(self, "_machine_details"):
             return None

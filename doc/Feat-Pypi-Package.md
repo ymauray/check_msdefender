@@ -47,7 +47,7 @@ version = "1.0.0"
 description = "A Nagios plugin for monitoring Microsoft Defender API endpoints"
 readme = "README.md"
 license = {text = "MIT"}
-requires-python = ">=3.6"
+requires-python = ">=3.9"
 ```
 
 ## 🚀 Publishing Steps

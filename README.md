@@ -1,6 +1,6 @@
 # 🛡️ Check MS Defender
 
-[![Python Version](https://img.shields.io/badge/python-3.6+-blue.svg)](https://python.org)
+[![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/lduchosal/check_msdefender)
 
@@ -14,7 +14,7 @@ A comprehensive **Nagios plugin** for monitoring Microsoft Defender for Endpoint
 - 🏗️ **Clean Architecture** - Modular design with testable components
 - 🔧 **Flexible Configuration** - File-based configuration with sensible defaults
 - 📈 **Verbose Logging** - Multi-level debugging support
-- 🐍 **Modern Python** - Built with Python 3.6+ using type hints and async patterns
+- 🐍 **Modern Python** - Built with Python 3.9+ using type hints and async patterns
 
 ## 🚀 Quick Start
 

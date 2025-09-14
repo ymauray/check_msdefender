@@ -1,21 +1,20 @@
 """Nagios plugin implementation."""
 
-import sys
 import nagiosplugin
-from nagiosplugin import Summary
+from typing import List, Optional, Union, Any
 
 
 class DefenderScalarContext(nagiosplugin.ScalarContext):
     """Custom scalar context with modified threshold logic for detail command."""
 
-    def __init__(self, name, warning=None, critical=None):
+    def __init__(self, name: str, warning: Optional[Union[float, int]] = None, critical: Optional[Union[float, int]] = None) -> None:
         """Initialize with custom threshold logic."""
         # Store original values to know what was actually set
         self._original_warning = warning
         self._original_critical = critical
         super().__init__(name, warning, critical)
 
-    def evaluate(self, metric, resource):
+    def evaluate(self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource) -> nagiosplugin.Result:
         """Evaluate metric against thresholds with <= logic for detail command."""
         if self.name == "found":
             # For detail command, use <= threshold logic (not < threshold)
@@ -79,19 +78,19 @@ class DefenderScalarContext(nagiosplugin.ScalarContext):
 class DefenderSummary(nagiosplugin.Summary):
     """Custom summary class for detailed Nagios output."""
 
-    def __init__(self, details):
+    def __init__(self, details: Optional[List[str]]) -> None:
         """Initialize with detailed output lines."""
         self.details = details or []
 
-    def ok(self, results):
+    def ok(self, results: nagiosplugin.Results) -> str:
         """Return detailed output for OK state."""
         return self._format_details()
 
-    def problem(self, results):
+    def problem(self, results: nagiosplugin.Results) -> str:
         """Return detailed output for problem states (WARNING, CRITICAL)."""
         return self._format_details()
 
-    def _format_details(self):
+    def _format_details(self) -> str:
         """Format details for output."""
         if not self.details:
             return ""
@@ -101,12 +100,12 @@ class DefenderSummary(nagiosplugin.Summary):
 class NagiosPlugin:
     """Nagios plugin for Microsoft Defender monitoring."""
 
-    def __init__(self, service, command_name):
+    def __init__(self, service: Any, command_name: str) -> None:
         """Initialize with a service and command name."""
         self.service = service
         self.command_name = command_name
 
-    def check(self, machine_id=None, dns_name=None, warning=None, critical=None, verbose=0):
+    def check(self, machine_id: Optional[str] = None, dns_name: Optional[str] = None, warning: Optional[Union[float, int]] = None, critical: Optional[Union[float, int]] = None, verbose: int = 0) -> int:
         """Execute the check and return Nagios exit code."""
         try:
             result = self.service.get_result(machine_id=machine_id, dns_name=dns_name)
@@ -130,7 +129,7 @@ class NagiosPlugin:
                 check.main()
                 return 0  # If main() doesn't exit, it's OK
             except SystemExit as e:
-                return e.code
+                return int(e.code) if e.code is not None else 0
 
         except Exception as e:
             print(f"UNKNOWN: {str(e)}")
@@ -140,17 +139,17 @@ class NagiosPlugin:
 class DefenderResource(nagiosplugin.Resource):
     """Defender resource for getting values with custom service name."""
 
-    def __init__(self, command_name, value):
+    def __init__(self, command_name: str, value: Union[int, float]) -> None:
         super().__init__()
         self.command_name = command_name
         self.value = value
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Return custom service name."""
         return "DEFENDER"
 
-    def probe(self):
+    def probe(self) -> List[nagiosplugin.Metric]:
         # Use 'found' as metric name for detail command, otherwise use command name
         metric_name = "found" if self.command_name == "detail" else self.command_name
         return [nagiosplugin.Metric(metric_name, self.value)]
