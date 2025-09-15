@@ -36,12 +36,12 @@ class DefenderClient:
     def _get_base_url(self, region: str) -> str:
         """Get base URL for the specified region."""
         endpoints = {
-            "eu": "https://eu.api.securitycenter.microsoft.com",
-            "us": "https://us.api.securitycenter.microsoft.com",
-            "uk": "https://uk.api.securitycenter.microsoft.com",
-            "api": "https://api.securitycenter.microsoft.com",
+            "eu": "https://eu.api.security.microsoft.com",
+            "us": "https://us.api.security.microsoft.com",
+            "uk": "https://uk.api.security.microsoft.com",
+            "api": "https://api.security.microsoft.com",
         }
-        return endpoints.get(region, endpoints["eu3"])
+        return endpoints.get(region, endpoints["eu"])
 
     def get_machine_by_dns_name(self, dns_name: str) -> Dict[str, Any]:
         """Get machine information by DNS name."""
