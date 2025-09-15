@@ -1,7 +1,6 @@
 """Last seen commands for CLI."""
 
 import sys
-import click
 from typing import Optional, Any
 
 from check_msdefender.core.auth import get_authenticator

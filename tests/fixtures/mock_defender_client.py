@@ -1,8 +1,8 @@
 """Mock Defender client for fixture tests."""
 
 import json
-import os
 from pathlib import Path
+
 from check_msdefender.core.exceptions import ValidationError
 
 

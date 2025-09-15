@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Test script for verbose mode functionality."""
 
-import sys
-import logging
 from check_msdefender.core.logging_config import get_verbose_logger
 
 

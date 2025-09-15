@@ -1,7 +1,6 @@
 """Error handlers and formatters for click CLI."""
 
 import click
-from typing import Any
 
 
 class ClickErrorHandler:

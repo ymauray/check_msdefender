@@ -1,11 +1,12 @@
 """Unit tests for DetailService."""
 
-import pytest
 import json
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock
 
-from check_msdefender.services.detail_service import DetailService
+import pytest
+
 from check_msdefender.core.exceptions import ValidationError
+from check_msdefender.services.detail_service import DetailService
 
 
 class TestDetailService:

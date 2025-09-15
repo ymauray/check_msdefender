@@ -1,7 +1,7 @@
 """Alerts service implementation."""
 
-from datetime import datetime
-from typing import Dict, Optional, Any, List
+from typing import Dict, Optional, Any
+
 from check_msdefender.core.exceptions import ValidationError
 from check_msdefender.core.logging_config import get_verbose_logger
 

@@ -1,11 +1,12 @@
 """Fixture tests for LastSeenService."""
 
-import pytest
 from datetime import datetime, timezone
 from unittest.mock import patch
 
-from check_msdefender.services.lastseen_service import LastSeenService
+import pytest
+
 from check_msdefender.core.exceptions import ValidationError
+from check_msdefender.services.lastseen_service import LastSeenService
 from tests.fixtures.mock_defender_client import MockDefenderClient
 
 
@@ -85,7 +86,6 @@ class TestLastSeenServiceFixtures:
 
     def test_get_result_high_precision_microseconds_regression(self):
         """Test parsing timestamp with high precision microseconds - regression test."""
-        import re
 
         # Create a mock client that returns timestamp with 7-digit microseconds
         class MockClientHighPrecision:

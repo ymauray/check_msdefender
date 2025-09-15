@@ -1,7 +1,7 @@
 """Machines service implementation."""
 
 from typing import Dict, List, Any
-from check_msdefender.core.exceptions import ValidationError
+
 from check_msdefender.core.logging_config import get_verbose_logger
 
 
