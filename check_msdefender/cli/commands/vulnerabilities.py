@@ -25,8 +25,8 @@ def register_vulnerability_commands(main_group: Any) -> None:
         critical: Optional[float],
     ) -> None:
         """Check vulnerability score for Microsoft Defender."""
-        warning = warning if warning is not None else 10
-        critical = critical if critical is not None else 100
+        warning = warning if warning is not None else 50
+        critical = critical if critical is not None else 500
 
         try:
             # Load configuration

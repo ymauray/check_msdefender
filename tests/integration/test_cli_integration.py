@@ -187,8 +187,8 @@ class TestVulnerabilitiesCommand:
         mock_plugin.check.assert_called_once_with(
             machine_id=None,
             dns_name="machine.domain.tld",
-            warning=10,
-            critical=100,
+            warning=50,
+            critical=500,
             verbose=0,
         )
 
@@ -219,8 +219,8 @@ class TestVulnerabilitiesCommand:
         mock_plugin.check.assert_called_once_with(
             machine_id=None,
             dns_name="machine.domain.tld",
-            warning=10,
-            critical=100,
+            warning=50,
+            critical=500,
             verbose=1,
         )
 
@@ -251,8 +251,8 @@ class TestVulnerabilitiesCommand:
         mock_plugin.check.assert_called_once_with(
             machine_id=None,
             dns_name="machine.domain.tld",
-            warning=10,
-            critical=100,
+            warning=50,
+            critical=500,
             verbose=4,
         )
 
