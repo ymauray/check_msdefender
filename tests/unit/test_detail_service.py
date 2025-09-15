@@ -49,7 +49,10 @@ class TestDetailService:
         """Test successful retrieval by DNS name."""
         # Mock DNS lookup response
         mock_dns_response = {"value": [{"id": "test-machine-456"}]}
-        mock_machine_data = {"id": "test-machine-456", "computerDnsName": "test.domain.com"}
+        mock_machine_data = {
+            "id": "test-machine-456",
+            "computerDnsName": "test.domain.com",
+        }
 
         self.mock_client.get_machine_by_dns_name.return_value = mock_dns_response
         self.mock_client.get_machine_by_id.return_value = mock_machine_data
@@ -60,7 +63,9 @@ class TestDetailService:
         assert result["value"] == 1
 
         # Should call both DNS lookup and machine ID retrieval
-        self.mock_client.get_machine_by_dns_name.assert_called_once_with("test.domain.com")
+        self.mock_client.get_machine_by_dns_name.assert_called_once_with(
+            "test.domain.com"
+        )
         self.mock_client.get_machine_by_id.assert_called_once_with("test-machine-456")
 
     def test_get_result_by_dns_name_not_found(self):
@@ -75,12 +80,16 @@ class TestDetailService:
         assert result["value"] == 0
 
         # Should not call get_machine_by_id since DNS lookup failed
-        self.mock_client.get_machine_by_dns_name.assert_called_once_with("nonexistent.domain.com")
+        self.mock_client.get_machine_by_dns_name.assert_called_once_with(
+            "nonexistent.domain.com"
+        )
         self.mock_client.get_machine_by_id.assert_not_called()
 
     def test_get_result_no_parameters(self):
         """Test error when no parameters provided."""
-        with pytest.raises(ValidationError, match="Either machine_id or dns_name must be provided"):
+        with pytest.raises(
+            ValidationError, match="Either machine_id or dns_name must be provided"
+        ):
             self.service.get_result()
 
         # Should not make any API calls
@@ -152,9 +161,15 @@ class TestDetailService:
         self.mock_client.get_machine_by_id.return_value = mock_machine_data
 
         # Call with both parameters - DNS name should be used first
-        result = self.service.get_result(machine_id="direct-machine", dns_name="test.domain.com")
+        result = self.service.get_result(
+            machine_id="direct-machine", dns_name="test.domain.com"
+        )
 
         assert result["value"] == 1
         # Should resolve via DNS first
-        self.mock_client.get_machine_by_dns_name.assert_called_once_with("test.domain.com")
-        self.mock_client.get_machine_by_id.assert_called_once_with("dns-resolved-machine")
+        self.mock_client.get_machine_by_dns_name.assert_called_once_with(
+            "test.domain.com"
+        )
+        self.mock_client.get_machine_by_id.assert_called_once_with(
+            "dns-resolved-machine"
+        )

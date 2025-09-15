@@ -54,6 +54,8 @@ class OnboardingService:
 
         result = {"value": result_value, "details": details}
 
-        self.logger.info(f"Machine onboarding status: {onboarding_state} -> {result_value}")
+        self.logger.info(
+            f"Machine onboarding status: {onboarding_state} -> {result_value}"
+        )
         self.logger.method_exit("get_result", result)
         return result

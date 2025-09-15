@@ -36,7 +36,8 @@ class VerboseLogger:
         if self.verbose_level >= 3:
             # Full trace format
             formatter = logging.Formatter(
-                "[%(levelname)s] %(asctime)s %(name)s:%(lineno)d - %(message)s", datefmt="%H:%M:%S"
+                "[%(levelname)s] %(asctime)s %(name)s:%(lineno)d - %(message)s",
+                datefmt="%H:%M:%S",
             )
         elif self.verbose_level >= 2:
             # Debug format
@@ -81,7 +82,9 @@ class VerboseLogger:
         """Log API call details if verbose >= 2."""
         if self.verbose_level >= 2:
             if status_code and response_time:
-                self.logger.debug(f"API {method} {url} -> {status_code} ({response_time:.3f}s)")
+                self.logger.debug(
+                    f"API {method} {url} -> {status_code} ({response_time:.3f}s)"
+                )
             else:
                 self.logger.debug(f"API {method} {url}")
 

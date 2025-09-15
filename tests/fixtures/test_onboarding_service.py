@@ -43,7 +43,9 @@ class TestOnboardingServiceFixtures:
 
     def test_get_result_no_parameters(self):
         """Test error when no parameters provided."""
-        with pytest.raises(ValidationError, match="Either machine_id or dns_name must be provided"):
+        with pytest.raises(
+            ValidationError, match="Either machine_id or dns_name must be provided"
+        ):
             self.service.get_result()
 
     def test_get_result_nonexistent_dns_name(self):

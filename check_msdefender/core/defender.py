@@ -13,7 +13,11 @@ class DefenderClient:
     application_json = "application/json"
 
     def __init__(
-        self, authenticator: Any, timeout: int = 5, region: str = "eu3", verbose_level: int = 0
+        self,
+        authenticator: Any,
+        timeout: int = 5,
+        region: str = "eu3",
+        verbose_level: int = 0,
     ) -> None:
         """Initialize with authenticator and optional region.
 
@@ -56,7 +60,9 @@ class DefenderClient:
         try:
             start_time = time.time()
             self.logger.info(f"Querying machine by DNS name: {dns_name}")
-            response = requests.get(url, headers=headers, params=params, timeout=self.timeout)
+            response = requests.get(
+                url, headers=headers, params=params, timeout=self.timeout
+            )
             elapsed = time.time() - start_time
 
             self.logger.api_call("GET", url, response.status_code, elapsed)
@@ -151,7 +157,9 @@ class DefenderClient:
         try:
             start_time = time.time()
             self.logger.info("Querying all machines")
-            response = requests.get(url, headers=headers, params=params, timeout=self.timeout)
+            response = requests.get(
+                url, headers=headers, params=params, timeout=self.timeout
+            )
             elapsed = time.time() - start_time
 
             self.logger.api_call("GET", url, response.status_code, elapsed)
@@ -189,7 +197,9 @@ class DefenderClient:
         try:
             start_time = time.time()
             self.logger.info("Querying alerts")
-            response = requests.get(url, headers=headers, params=params, timeout=self.timeout)
+            response = requests.get(
+                url, headers=headers, params=params, timeout=self.timeout
+            )
             elapsed = time.time() - start_time
 
             self.logger.api_call("GET", url, response.status_code, elapsed)

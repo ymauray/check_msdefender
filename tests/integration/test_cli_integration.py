@@ -21,7 +21,10 @@ class TestHelpCommand:
         result = cli_runner.invoke(main, ["--help"])
 
         assert result.exit_code == 0
-        assert "Check Microsoft Defender API endpoints and validate values." in result.output
+        assert (
+            "Check Microsoft Defender API endpoints and validate values."
+            in result.output
+        )
         assert "Commands:" in result.output
         assert "lastseen" in result.output
         assert "onboarding" in result.output
@@ -33,7 +36,10 @@ class TestHelpCommand:
         result = cli_runner.invoke(main, ["--help"])
 
         assert result.exit_code == 0
-        assert "Check Microsoft Defender API endpoints and validate values." in result.output
+        assert (
+            "Check Microsoft Defender API endpoints and validate values."
+            in result.output
+        )
 
 
 class TestLastSeenCommand:
@@ -88,7 +94,11 @@ class TestLastSeenCommand:
 
         assert result.exit_code == 0
         mock_plugin.check.assert_called_once_with(
-            machine_id=None, dns_name="machine.domain.tld", warning=7, critical=30, verbose=0
+            machine_id=None,
+            dns_name="machine.domain.tld",
+            warning=7,
+            critical=30,
+            verbose=0,
         )
 
     @patch("check_msdefender.cli.commands.lastseen.load_config")
@@ -129,7 +139,11 @@ class TestOnboardingCommand:
 
         assert result.exit_code == 0
         mock_plugin.check.assert_called_once_with(
-            machine_id=None, dns_name="machine.domain.tld", warning=1, critical=2, verbose=0
+            machine_id=None,
+            dns_name="machine.domain.tld",
+            warning=1,
+            critical=2,
+            verbose=0,
         )
 
     @patch("check_msdefender.cli.commands.onboarding.load_config")
@@ -165,11 +179,17 @@ class TestVulnerabilitiesCommand:
         mock_nagios.return_value = mock_plugin
         mock_plugin.check.return_value = 0
 
-        result = cli_runner.invoke(main, ["vulnerabilities", "-d", "machine.domain.tld"])
+        result = cli_runner.invoke(
+            main, ["vulnerabilities", "-d", "machine.domain.tld"]
+        )
 
         assert result.exit_code == 0
         mock_plugin.check.assert_called_once_with(
-            machine_id=None, dns_name="machine.domain.tld", warning=10, critical=100, verbose=0
+            machine_id=None,
+            dns_name="machine.domain.tld",
+            warning=10,
+            critical=100,
+            verbose=0,
         )
 
     @patch("check_msdefender.cli.commands.vulnerabilities.load_config")
@@ -191,11 +211,17 @@ class TestVulnerabilitiesCommand:
         mock_nagios.return_value = mock_plugin
         mock_plugin.check.return_value = 0
 
-        result = cli_runner.invoke(main, ["vulnerabilities", "-d", "machine.domain.tld", "-v"])
+        result = cli_runner.invoke(
+            main, ["vulnerabilities", "-d", "machine.domain.tld", "-v"]
+        )
 
         assert result.exit_code == 0
         mock_plugin.check.assert_called_once_with(
-            machine_id=None, dns_name="machine.domain.tld", warning=10, critical=100, verbose=1
+            machine_id=None,
+            dns_name="machine.domain.tld",
+            warning=10,
+            critical=100,
+            verbose=1,
         )
 
     @patch("check_msdefender.cli.commands.vulnerabilities.load_config")
@@ -217,11 +243,17 @@ class TestVulnerabilitiesCommand:
         mock_nagios.return_value = mock_plugin
         mock_plugin.check.return_value = 0
 
-        result = cli_runner.invoke(main, ["vulnerabilities", "-d", "machine.domain.tld", "-vvvv"])
+        result = cli_runner.invoke(
+            main, ["vulnerabilities", "-d", "machine.domain.tld", "-vvvv"]
+        )
 
         assert result.exit_code == 0
         mock_plugin.check.assert_called_once_with(
-            machine_id=None, dns_name="machine.domain.tld", warning=10, critical=100, verbose=4
+            machine_id=None,
+            dns_name="machine.domain.tld",
+            warning=10,
+            critical=100,
+            verbose=4,
         )
 
     @patch("check_msdefender.cli.commands.vulnerabilities.load_config")
@@ -229,7 +261,9 @@ class TestVulnerabilitiesCommand:
         """Test vulnerabilities command error handling."""
         mock_config.side_effect = Exception("Service unavailable")
 
-        result = cli_runner.invoke(main, ["vulnerabilities", "-d", "machine.domain.tld"])
+        result = cli_runner.invoke(
+            main, ["vulnerabilities", "-d", "machine.domain.tld"]
+        )
 
         assert result.exit_code == 3
         assert "UNKNOWN: Service unavailable" in result.output
@@ -257,7 +291,9 @@ class TestDetailCommand:
             "value": 1,
             "details": ["Machine ID: test-machine", "Computer Name: test-pc"],
         }
-        mock_service_instance.get_machine_details_json.return_value = '{"id": "test-machine"}'
+        mock_service_instance.get_machine_details_json.return_value = (
+            '{"id": "test-machine"}'
+        )
 
         result = cli_runner.invoke(main, ["detail", "-i", "test-machine-123"])
 
@@ -287,7 +323,9 @@ class TestDetailCommand:
             "value": 1,
             "details": ["Machine ID: test-machine", "Computer Name: test-pc"],
         }
-        mock_service_instance.get_machine_details_json.return_value = '{"id": "test-machine"}'
+        mock_service_instance.get_machine_details_json.return_value = (
+            '{"id": "test-machine"}'
+        )
 
         result = cli_runner.invoke(main, ["detail", "-m", "test-machine-456"])
 
@@ -349,7 +387,9 @@ class TestDetailCommand:
             "details": ["Machine not found with DNS name: nonexistent.domain.com"],
         }
 
-        result = cli_runner.invoke(main, ["detail", "-d", "nonexistent.domain.com", "-W", "0"])
+        result = cli_runner.invoke(
+            main, ["detail", "-d", "nonexistent.domain.com", "-W", "0"]
+        )
 
         assert result.exit_code == 1  # Warning
         assert "DEFENDER WARNING - Machine not found" in result.output
@@ -375,7 +415,9 @@ class TestDetailCommand:
             "details": ["Machine not found with DNS name: nonexistent.domain.com"],
         }
 
-        result = cli_runner.invoke(main, ["detail", "-d", "nonexistent.domain.com", "-C", "0"])
+        result = cli_runner.invoke(
+            main, ["detail", "-d", "nonexistent.domain.com", "-C", "0"]
+        )
 
         assert result.exit_code == 2  # Critical
         assert "DEFENDER CRITICAL - Machine not found" in result.output
@@ -396,6 +438,8 @@ class TestDetailCommand:
         result = cli_runner.invoke(main, ["detail", "--help"])
 
         assert result.exit_code == 0
-        assert "Get detailed machine information from Microsoft Defender." in result.output
+        assert (
+            "Get detailed machine information from Microsoft Defender." in result.output
+        )
         assert "-m, -i, --machine-id, --id TEXT" in result.output
         assert "-d, --dns-name TEXT" in result.output

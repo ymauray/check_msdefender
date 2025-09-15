@@ -101,7 +101,9 @@ class TestAlertsService:
         assert len(result["details"]) == 2  # Summary line + 1 alert detail
 
         # Should call DNS lookup
-        self.mock_client.get_machine_by_dns_name.assert_called_once_with("test.example.com")
+        self.mock_client.get_machine_by_dns_name.assert_called_once_with(
+            "test.example.com"
+        )
         self.mock_client.get_alerts.assert_called_once()
 
     def test_get_result_by_dns_name_not_found(self):
@@ -113,12 +115,16 @@ class TestAlertsService:
         with pytest.raises(ValidationError, match="Machine not found with DNS name"):
             self.service.get_result(dns_name="nonexistent.domain.com")
 
-        self.mock_client.get_machine_by_dns_name.assert_called_once_with("nonexistent.domain.com")
+        self.mock_client.get_machine_by_dns_name.assert_called_once_with(
+            "nonexistent.domain.com"
+        )
         self.mock_client.get_alerts.assert_not_called()
 
     def test_get_result_no_parameters(self):
         """Test error when no parameters provided."""
-        with pytest.raises(ValidationError, match="Either machine_id or dns_name must be provided"):
+        with pytest.raises(
+            ValidationError, match="Either machine_id or dns_name must be provided"
+        ):
             self.service.get_result()
 
         self.mock_client.get_machine_by_dns_name.assert_not_called()

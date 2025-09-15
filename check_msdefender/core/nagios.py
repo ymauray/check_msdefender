@@ -128,7 +128,9 @@ class NagiosPlugin:
 
             # Create Nagios check with custom summary
             # Use 'found' as context name for detail command, otherwise use command name
-            context_name = "found" if self.command_name == "detail" else self.command_name
+            context_name = (
+                "found" if self.command_name == "detail" else self.command_name
+            )
             check = nagiosplugin.Check(
                 DefenderResource(self.command_name, value),
                 DefenderScalarContext(context_name, warning, critical),

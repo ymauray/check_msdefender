@@ -48,14 +48,26 @@ def test_lastseen_command_success(
     # Execute command
     result = cli_runner.invoke(
         mock_app,
-        ["lastseen", "--machine-id", "test-machine-id", "--warning", "5", "--critical", "10"],
+        [
+            "lastseen",
+            "--machine-id",
+            "test-machine-id",
+            "--warning",
+            "5",
+            "--critical",
+            "10",
+        ],
     )
 
     # Verify result
     assert result.exit_code == 0
     mock_nagios.assert_called_once_with(mock_service_instance, "lastseen")
     mock_plugin.check.assert_called_once_with(
-        machine_id="test-machine-id", dns_name=None, warning=5, critical=10, verbose=False
+        machine_id="test-machine-id",
+        dns_name=None,
+        warning=5,
+        critical=10,
+        verbose=False,
     )
 
 
@@ -66,7 +78,9 @@ def test_lastseen_command_exception(mock_config, cli_runner, mock_app):
     mock_config.side_effect = Exception("Test error")
 
     # Execute command
-    result = cli_runner.invoke(mock_app, ["lastseen", "--machine-id", "test-machine-id"])
+    result = cli_runner.invoke(
+        mock_app, ["lastseen", "--machine-id", "test-machine-id"]
+    )
 
     # Verify error handling
     assert result.exit_code == 3  # Now properly returns exit code 3 for UNKNOWN

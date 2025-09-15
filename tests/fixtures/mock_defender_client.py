@@ -38,7 +38,9 @@ class MockDefenderClient:
 
     def get_machine_vulnerabilities(self, machine_id):
         """Get vulnerabilities for machine from fixtures."""
-        return self.vulnerability_data["vulnerabilities_by_machine"].get(machine_id, {"value": []})
+        return self.vulnerability_data["vulnerabilities_by_machine"].get(
+            machine_id, {"value": []}
+        )
 
     def get_alerts(self):
         """Get all alerts from fixtures."""

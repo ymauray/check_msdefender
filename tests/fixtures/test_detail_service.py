@@ -56,7 +56,9 @@ class TestDetailServiceFixtures:
 
     def test_get_result_no_parameters(self):
         """Test error when no parameters provided."""
-        with pytest.raises(ValidationError, match="Either machine_id or dns_name must be provided"):
+        with pytest.raises(
+            ValidationError, match="Either machine_id or dns_name must be provided"
+        ):
             self.service.get_result()
 
     def test_get_result_nonexistent_dns_name(self):
@@ -70,7 +72,9 @@ class TestDetailServiceFixtures:
 
     def test_get_result_nonexistent_machine_id(self):
         """Test error when machine ID doesn't exist."""
-        with pytest.raises(ValidationError, match="Machine not found: nonexistent-machine"):
+        with pytest.raises(
+            ValidationError, match="Machine not found: nonexistent-machine"
+        ):
             self.service.get_result(machine_id="nonexistent-machine")
 
     def test_machine_details_comprehensive(self):
@@ -96,7 +100,9 @@ class TestDetailServiceFixtures:
         ]
 
         for field in expected_fields:
-            assert field in details_dict, f"Field '{field}' missing from machine details"
+            assert field in details_dict, (
+                f"Field '{field}' missing from machine details"
+            )
 
         # Verify specific values for test-machine-3
         assert details_dict["id"] == "test-machine-3"

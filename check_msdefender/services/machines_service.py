@@ -23,7 +23,10 @@ class MachinesService:
 
         if not machines_data.get("value"):
             self.logger.info("No machines found")
-            result = {"value": 0, "details": ["No machines found in Microsoft Defender"]}
+            result = {
+                "value": 0,
+                "details": ["No machines found in Microsoft Defender"],
+            }
             self.logger.method_exit("get_result", result)
             return result
 
@@ -39,7 +42,11 @@ class MachinesService:
 
         # Sort by priority
         sorted_machines = sorted(
-            machines, key=lambda x: (status_priority[x["onboardingStatus"]], x["computerDnsName"])
+            machines,
+            key=lambda x: (
+                status_priority[x["onboardingStatus"]],
+                x["computerDnsName"],
+            ),
         )
         for machine in sorted_machines:
             onboarded = "✓" if machine["onboardingStatus"] == "Onboarded" else "✗"

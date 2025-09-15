@@ -67,7 +67,9 @@ class TestAlertsServiceFixtures:
 
     def test_get_result_no_parameters(self):
         """Test error when no parameters provided."""
-        with pytest.raises(ValidationError, match="Either machine_id or dns_name must be provided"):
+        with pytest.raises(
+            ValidationError, match="Either machine_id or dns_name must be provided"
+        ):
             self.service.get_result()
 
     def test_get_result_nonexistent_dns_name(self):
@@ -135,7 +137,8 @@ class TestAlertsServiceFixtures:
         # Should include alert titles and severity/status
         assert "suspicious activity detected (new high)" in details_text.lower()
         assert (
-            "automated investigation started manually (new informational)" in details_text.lower()
+            "automated investigation started manually (new informational)"
+            in details_text.lower()
         )
 
     def test_dns_name_matching(self):

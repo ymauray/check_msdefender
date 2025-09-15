@@ -41,7 +41,9 @@ class VulnerabilitiesService:
 
         # Process and deduplicate vulnerabilities
         vulnerabilities = self._process_vulnerabilities(raw_vulnerabilities)
-        self.logger.info(f"Found {len(vulnerabilities)} unique vulnerabilities after deduplication")
+        self.logger.info(
+            f"Found {len(vulnerabilities)} unique vulnerabilities after deduplication"
+        )
 
         # Calculate vulnerability score
         score = VulnerabilityScore()
@@ -54,7 +56,9 @@ class VulnerabilitiesService:
 
         for vuln in sorted_vulnerabilities:
             severity = vuln.severity.lower()
-            self.logger.debug(f"Processing vulnerability {vuln.id} with severity: {severity}")
+            self.logger.debug(
+                f"Processing vulnerability {vuln.id} with severity: {severity}"
+            )
 
             if severity == "critical":
                 score.critical += 1
@@ -75,7 +79,8 @@ class VulnerabilitiesService:
         self.logger.info(f"Total vulnerability score: {score.total_score}")
 
         details.insert(
-            0, f"Vulnerabilities: {len(raw_vulnerabilities)}, score: {score.total_score}"
+            0,
+            f"Vulnerabilities: {len(raw_vulnerabilities)}, score: {score.total_score}",
         )
 
         result = {"value": score.total_score, "details": details}
@@ -125,7 +130,9 @@ class VulnerabilitiesService:
         # Sort by severity
         sorted_vulnerabilities = self._sort_by_severity(vulnerabilities)
 
-        self.logger.method_exit("get_detailed_vulnerabilities", len(sorted_vulnerabilities))
+        self.logger.method_exit(
+            "get_detailed_vulnerabilities", len(sorted_vulnerabilities)
+        )
         return sorted_vulnerabilities
 
     def _process_vulnerabilities(
@@ -156,8 +163,11 @@ class VulnerabilitiesService:
 
         return unique_vulnerabilities
 
-    def _sort_by_severity(self, vulnerabilities: List[Vulnerability]) -> List[Vulnerability]:
+    def _sort_by_severity(
+        self, vulnerabilities: List[Vulnerability]
+    ) -> List[Vulnerability]:
         """Sort vulnerabilities by severity (Critical > High > Medium > Low)."""
         return sorted(
-            vulnerabilities, key=lambda v: self._severity_order.get(v.severity.lower(), 999)
+            vulnerabilities,
+            key=lambda v: self._severity_order.get(v.severity.lower(), 999),
         )
