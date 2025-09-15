@@ -4,3 +4,4 @@
 /.env
 /check_msdefender.ini
 /doc/private
+/.pdm-build/

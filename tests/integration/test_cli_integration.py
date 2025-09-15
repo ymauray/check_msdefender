@@ -397,6 +397,5 @@ class TestDetailCommand:
 
         assert result.exit_code == 0
         assert "Get detailed machine information from Microsoft Defender." in result.output
-        assert "-i, --id TEXT" in result.output
-        assert "-m, --machine-id TEXT" in result.output
+        assert "-m, -i, --machine-id, --id TEXT" in result.output
         assert "-d, --dns-name TEXT" in result.output

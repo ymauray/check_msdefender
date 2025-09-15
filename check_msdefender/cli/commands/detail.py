@@ -23,7 +23,7 @@ def register_detail_commands(main_group: Any) -> None:
         machine_id: Optional[str],
         dns_name: Optional[str],
         warning: Optional[float],
-        critical: Optional[float]
+        critical: Optional[float],
     ) -> None:
         """Get detailed machine information from Microsoft Defender."""
         try:

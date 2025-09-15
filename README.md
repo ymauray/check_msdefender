@@ -258,7 +258,6 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
 # Install in development mode
 pip install -e .
-pip install -r requirements-dev.txt
 ```
 
 ### Code Quality Tools

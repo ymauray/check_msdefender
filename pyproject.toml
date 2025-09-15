@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
 
 [project]
 name = "check-msdefender"
@@ -40,6 +40,8 @@ dev = [
     "flake8>=3.8",
     "mypy>=0.800",
     "twine>=6.2.0",
+    "pdm>=2.0.0",
+    "ruff>=0.13.0"
 ]
 
 [project.urls]
@@ -70,3 +72,12 @@ python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 addopts = "-v"
+
+[tool.pdm.scripts]
+format = "black ."
+typecheck = "mypy check_msdefender/"
+lint = "flake8 check_msdefender/"
+build = "python -m build"
+publish = "python -m twine upload dist/* --verbose"
+test = "pytest -v tests/"
+all = {composite = ["format", "build", "test", "typecheck", "lint"]}
