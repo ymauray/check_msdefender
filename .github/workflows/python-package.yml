@@ -32,7 +32,7 @@ jobs:
         pdm install -G dev
     - name: Build with pdm
       run: |
-        pdm run build
+        pdm build
     - name: Test with pytest
       run: |
-        pdm run test
+        pdm test
