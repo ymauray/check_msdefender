@@ -16,7 +16,7 @@ class DefenderClient:
         self,
         authenticator: Any,
         timeout: int = 5,
-        region: str = "eu3",
+        region: str = "eu",
         verbose_level: int = 0,
     ) -> None:
         """Initialize with authenticator and optional region.
@@ -36,10 +36,10 @@ class DefenderClient:
     def _get_base_url(self, region: str) -> str:
         """Get base URL for the specified region."""
         endpoints = {
-            "eu": "https://api-eu.securitycenter.microsoft.com",
-            "eu3": "https://api-eu3.securitycenter.microsoft.com",
-            "us": "https://api.securitycenter.microsoft.com",
-            "uk": "https://api-uk.securitycenter.microsoft.com",
+            "eu": "https://eu.api.securitycenter.microsoft.com",
+            "us": "https://us.api.securitycenter.microsoft.com",
+            "uk": "https://uk.api.securitycenter.microsoft.com",
+            "api": "https://api.securitycenter.microsoft.com",
         }
         return endpoints.get(region, endpoints["eu3"])
 
