@@ -16,7 +16,6 @@ def register_detail_commands(main_group: Any) -> None:
     """Register detail commands with the main CLI group."""
 
     @main_group.command("detail")
-    @click.option("-i", "--id", "machine_id_alt", help="Machine ID (GUID)")
     @common_options
     def detail_cmd(
         config: str,
@@ -24,8 +23,7 @@ def register_detail_commands(main_group: Any) -> None:
         machine_id: Optional[str],
         dns_name: Optional[str],
         warning: Optional[float],
-        critical: Optional[float],
-        machine_id_alt: Optional[str],
+        critical: Optional[float]
     ) -> None:
         """Get detailed machine information from Microsoft Defender."""
         try:
@@ -44,9 +42,6 @@ def register_detail_commands(main_group: Any) -> None:
             # Create custom Nagios plugin for detail output
             plugin = NagiosPlugin(service, "detail")
 
-            # Use -i option if provided, otherwise fallback to -m
-            final_machine_id = machine_id_alt or machine_id
-
             # Set default thresholds for detail command to show proper performance data
             # Based on expected test output patterns
             if warning is not None and critical is None:
@@ -58,7 +53,7 @@ def register_detail_commands(main_group: Any) -> None:
 
             # Execute check
             result = plugin.check(
-                machine_id=final_machine_id,
+                machine_id=machine_id,
                 dns_name=dns_name,
                 warning=warning,
                 critical=critical,
