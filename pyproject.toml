@@ -4,7 +4,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "check-msdefender"
-version = "1.1.5"
+version = "1.1.6"
 authors = [
     {name = "ldvchosal", email = "ldvchosal@github.com"},
 ]

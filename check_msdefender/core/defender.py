@@ -15,8 +15,8 @@ class DefenderClient:
     def __init__(
         self,
         authenticator: Any,
-        timeout: int = 5,
-        region: str = "eu",
+        timeout: int = 15,
+        region: str = "api",
         verbose_level: int = 0,
     ) -> None:
         """Initialize with authenticator and optional region.
