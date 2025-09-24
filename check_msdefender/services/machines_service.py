@@ -13,7 +13,7 @@ class MachinesService:
         self.defender = defender_client
         self.logger = get_verbose_logger(__name__, verbose_level)
 
-    def get_result(self, **kwargs: Any) -> Dict[str, Any]:
+    def get_result(self) -> Dict[str, Any]:
         """Get machine count result with value and details."""
         self.logger.method_entry("get_result")
 
@@ -44,8 +44,8 @@ class MachinesService:
         sorted_machines = sorted(
             machines,
             key=lambda x: (
-                status_priority[x["onboardingStatus"]],
-                x["computerDnsName"],
+                status_priority[x["onboardingStatus"] or ""],
+                x["computerDnsName"] or "",
             ),
         )
         for machine in sorted_machines:
@@ -60,7 +60,7 @@ class MachinesService:
         self.logger.method_exit("get_result", result)
         return result
 
-    def get_details(self, **kwargs: Any) -> List[str]:
+    def get_details(self) -> List[str]:
         """Get detailed machine information."""
         self.logger.method_entry("get_details")
 
