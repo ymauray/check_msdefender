@@ -4,10 +4,9 @@ Get installed products and software from Microsoft Defender for a specific machi
 
 ## API Endpoint
 - Base URL: `https://api.securitycenter.windows.com`
-- Endpoint: `/api/tvm/analytics/assets/{machine_id}/installations/`
+- Endpoint: `/api/machines/SoftwareVulnerabilitiesByMachine`
 - Method: GET
 - Authentication: Bearer token (Azure AD)
-- Query Parameters: `?pageIndex=1&pageSize=100&$filter=(ProductCategory ne 'Component')&$orderby=isNormalized desc`
 
 ## Implementation
 
@@ -40,62 +39,60 @@ Location: `check_msdefender/core/defender.py`
 **Sample API Response:**
 ```json
 {
-  "numOfResults": 26,
-  "results": [
+  "@odata.context": "https://api-eu3.securitycenter.microsoft.com/api/$metadata#Collection(microsoft.windowsDefenderATP.api.AssetVulnerability)",
+  "value": [
     {
-      "installedVersion": "3.3.1.0",
-      "tableIndicator": "SnapshotTable",
-      "productNeverMatched": false,
-      "productCategory": "Component",
-      "installationId": "openssl-_-openssl-_-3.3.1.0",
-      "productName": "openssl",
-      "vendor": "openssl",
-      "assetId": "xxx_machine_id_xxx",
-      "assetName": "xxx_machine_name_xxx",
-      "dnsName": "xxx_machine_dns_name_xxx",
-      "firstSeen": "2025-09-10T09:59:49Z",
-      "lastSeen": "2025-09-17T14:52:23Z",
-      "weaknesses": 5,
-      "threatInfo": {
-        "hasExploit": false,
-        "isExploitVerified": false,
-        "isInExploitKit": false,
-        "exploitTypes": [
-          "Remote"
-        ],
-        "exploitUris": [],
-        "isLinkedToThreat": false,
-        "isThreatActive": false
-      },
-      "highSevAlert": false,
-      "rawInfo": {
-        "rawProgram": "The OpenSSL Toolkit",
-        "rawVendor": "The OpenSSL Project, https://www.openssl.org/"
-      },
-      "rbacGroup": 0,
-      "osName": "Windows11",
-      "isNormalized": true,
-      "eolSoftwareState": "NotEOL",
-      "eolVersionState": "NotEOL",
-      "eolVersionSinceDate": "2026-04-09T00:00:00+00:00",
-      "osDistribution": "None",
-      "totalUsageInDays": 0,
-      "assetCriticalityLevel": 0,
-      "assetCriticalityLevelText": "None",
-      "tags": []
-    }
-  ]
-}
+      "id": "018d7dc428d98e16abed667a759f9e40a7e8f2c8_openssl_openssl_3.3.1.0_CVE-2024-9143",
+      "deviceId": "018d7dc428d98e16abed667a759f9e40a7e8f2c8",
+      "rbacGroupId": 0,
+      "rbacGroupName": "Unassigned",
+      "deviceName": "petit-tonnerre.arcantel.ch",
+      "osPlatform": "Windows11",
+      "osVersion": "10.0.26100.6584",
+      "osArchitecture": "x64",
+      "softwareVendor": "openssl",
+      "softwareName": "openssl",
+      "softwareVersion": "3.3.1.0",
+      "cveId": "CVE-2024-9143",
+      "vulnerabilitySeverityLevel": "Low",
+      "recommendedSecurityUpdate": null,
+      "recommendedSecurityUpdateId": null,
+      "recommendedSecurityUpdateUrl": null,
+      "diskPaths": [
+        "c:\\program files\\druide\\antidote 12\\application\\bin64\\libcrypto-3-x64.dll",
+        "c:\\program files\\druide\\antidote 12\\application\\bin64\\libssl-3-x64.dll",
+        "c:\\program files\\druide\\connectix 12\\application\\bin64\\libcrypto-3-x64.dll",
+        "c:\\program files\\druide\\connectix 12\\application\\bin64\\libssl-3-x64.dll"
+      ],
+      "registryPaths": [],
+      "lastSeenTimestamp": "2025-09-17 14:52:23",
+      "firstSeenTimestamp": "2025-09-10 11:18:18",
+      "endOfSupportStatus": null,
+      "endOfSupportDate": null,
+      "exploitabilityLevel": "NoExploit",
+      "recommendationReference": "va-_-openssl-_-openssl",
+      "cvssScore": 3.7,
+      "securityUpdateAvailable": true,
+      "cveMitigationStatus": null
+    },
 ```
 
 ## Output Format
 
 ### Success (Machine Found)
 ```
-DEFENDER OK - 26 products installed on machine.domain.tld | products=26;;;
-openssl 3.3.1.0 (openssl) - 5 weaknesses, EOL: 2026-04-09
-installationId installedVersion (Vendor) - X weaknesses, EOL status
-Product Version (Vendor) - X weaknesses, EOL status
+DEFENDER OK - 26 CVE found on machine.domain.tld | products=26;;;
+openssl 3.3.1.0 (openssl) - 5 weaknesses (CVE-2024-9143, CVE-2024-9143..)
+ - c:\\program files\\druide\\antidote 12\\application\\bin64\\libcrypto-3-x64.dll
+ - c:\\program files\\druide\\antidote 12\\application\\bin64\\libssl-3-x64.dll
+ - c:\\program files\\druide\\connectix 12\\application\\bin64\\libcrypto-3-x64.dll
+ - c:\\program files\\druide\\connectix 12\\application\\bin64\\libssl-3-x64.dll
+openssl 3.3.1.0 (openssl) - 5 weaknesses (CVE-2024-9143, CVE-2024-9143..)
+ - c:\\program files\\druide\\antidote 12\\application\\bin64\\libcrypto-3-x64.dll
+ - c:\\program files\\druide\\antidote 12\\application\\bin64\\libssl-3-x64.dll
+ - c:\\program files\\druide\\connectix 12\\application\\bin64\\libcrypto-3-x64.dll
+ - c:\\program files\\druide\\connectix 12\\application\\bin64\\libssl-3-x64.dll
+
 ```
 
 ### Failure States

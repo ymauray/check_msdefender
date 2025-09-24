@@ -6,6 +6,16 @@ from typing import Any, Dict, cast
 from check_msdefender.core.exceptions import DefenderAPIError
 from check_msdefender.core.logging_config import get_verbose_logger
 
+PARAM_TOP = "$top"
+
+PARAM_EXPAND = "$expand"
+
+PARAM_ORDERBY = "$orderby"
+
+PARAM_FILTER = "$filter"
+
+PARAM_SELECT = "$select"
+
 
 class DefenderClient:
     """Client for Microsoft Defender API."""
@@ -55,14 +65,15 @@ class DefenderClient:
             "Content-Type": DefenderClient.application_json,
         }
 
-        params = {"$filter": f"computerDnsName eq '{dns_name}'", "$select": "id"}
+        params = {
+            PARAM_FILTER: f"computerDnsName eq '{dns_name}'",
+            PARAM_SELECT: "id"
+        }
 
         try:
             start_time = time.time()
             self.logger.info(f"Querying machine by DNS name: {dns_name}")
-            response = requests.get(
-                url, headers=headers, params=params, timeout=self.timeout
-            )
+            response = requests.get(url, headers=headers, params=params, timeout=self.timeout)
             elapsed = time.time() - start_time
 
             self.logger.api_call("GET", url, response.status_code, elapsed)
@@ -152,14 +163,12 @@ class DefenderClient:
             "Content-Type": DefenderClient.application_json,
         }
 
-        params = {"$select": "id,computerDnsName,onboardingStatus,osPlatform"}
+        params = {PARAM_SELECT: "id,computerDnsName,onboardingStatus,osPlatform"}
 
         try:
             start_time = time.time()
             self.logger.info("Querying all machines")
-            response = requests.get(
-                url, headers=headers, params=params, timeout=self.timeout
-            )
+            response = requests.get(url, headers=headers, params=params, timeout=self.timeout)
             elapsed = time.time() - start_time
 
             self.logger.api_call("GET", url, response.status_code, elapsed)
@@ -188,18 +197,16 @@ class DefenderClient:
         }
 
         params = {
-            "$top": "100",
-            "$expand": "evidence",
-            "$orderby": "alertCreationTime desc",
-            "$select": "status,title,machineId,computerDnsName,alertCreationTime,firstEventTime,lastEventTime,lastUpdateTime,severity",
+            PARAM_TOP: "100",
+            PARAM_EXPAND: "evidence",
+            PARAM_ORDERBY: "alertCreationTime desc",
+            PARAM_SELECT: "status,title,machineId,computerDnsName,alertCreationTime,firstEventTime,lastEventTime,lastUpdateTime,severity",
         }
 
         try:
             start_time = time.time()
             self.logger.info("Querying alerts")
-            response = requests.get(
-                url, headers=headers, params=params, timeout=self.timeout
-            )
+            response = requests.get(url, headers=headers, params=params, timeout=self.timeout)
             elapsed = time.time() - start_time
 
             self.logger.api_call("GET", url, response.status_code, elapsed)
@@ -208,6 +215,40 @@ class DefenderClient:
             result = cast(Dict[str, Any], response.json())
             self.logger.json_response(str(result))
             self.logger.method_exit("get_alerts", result)
+            return result
+        except requests.RequestException as e:
+            self.logger.debug(f"API request failed: {str(e)}")
+            if hasattr(e, "response") and e.response is not None:
+                self.logger.debug(f"Response: {str(e.response.content)}")
+            raise DefenderAPIError(f"Failed to query MS Defender API: {str(e)}")
+
+    def get_products(self) -> Dict[str, Any]:
+        """Get installed products for a machine."""
+        self.logger.method_entry("get_products")
+
+        token = self._get_token()
+
+        # Use the TVM API endpoint for products
+        url = f"{self.base_url}/api/machines/SoftwareVulnerabilitiesByMachine"
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": DefenderClient.application_json,
+        }
+
+        params = {"pageIndex": "1", "pageSize": "50000"}
+
+        try:
+            start_time = time.time()
+            self.logger.info("Querying products")
+            response = requests.get(url, headers=headers, params=params, timeout=self.timeout)
+            elapsed = time.time() - start_time
+
+            self.logger.api_call("GET", url, response.status_code, elapsed)
+            response.raise_for_status()
+
+            result = cast(Dict[str, Any], response.json())
+            self.logger.json_response(str(result))
+            self.logger.method_exit("get_products", result)
             return result
         except requests.RequestException as e:
             self.logger.debug(f"API request failed: {str(e)}")

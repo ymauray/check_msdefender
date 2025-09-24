@@ -7,6 +7,7 @@ from .onboarding import register_onboarding_commands
 from .machines import register_machines_commands
 from .detail import register_detail_commands
 from .alerts import register_alerts_commands
+from .products import register_products_commands
 
 
 def register_all_commands(main_group: Any) -> None:
@@ -17,3 +18,4 @@ def register_all_commands(main_group: Any) -> None:
     register_machines_commands(main_group)
     register_detail_commands(main_group)
     register_alerts_commands(main_group)
+    register_products_commands(main_group)

@@ -82,9 +82,7 @@ class VerboseLogger:
         """Log API call details if verbose >= 2."""
         if self.verbose_level >= 2:
             if status_code and response_time:
-                self.logger.debug(
-                    f"API {method} {url} -> {status_code} ({response_time:.3f}s)"
-                )
+                self.logger.debug(f"API {method} {url} -> {status_code} ({response_time:.3f}s)")
             else:
                 self.logger.debug(f"API {method} {url}")
 

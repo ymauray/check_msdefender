@@ -62,9 +62,7 @@ class LastSeenService:
 
             result = {"value": days_diff, "details": details}
 
-            self.logger.info(
-                f"Machine last seen {days_diff} days ago ({last_seen_str})"
-            )
+            self.logger.info(f"Machine last seen {days_diff} days ago ({last_seen_str})")
             self.logger.method_exit("get_result", result)
             return result
         except (ValueError, TypeError) as e:

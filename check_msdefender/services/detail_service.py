@@ -54,21 +54,15 @@ class DetailService:
             # Create detailed output
             details = []
             details.append(f"Machine ID: {machine_details.get('id', 'Unknown')}")
-            details.append(
-                f"Computer Name: {machine_details.get('computerDnsName', 'Unknown')}"
-            )
-            details.append(
-                f"OS Platform: {machine_details.get('osPlatform', 'Unknown')}"
-            )
+            details.append(f"Computer Name: {machine_details.get('computerDnsName', 'Unknown')}")
+            details.append(f"OS Platform: {machine_details.get('osPlatform', 'Unknown')}")
             details.append(f"OS Version: {machine_details.get('osVersion', 'Unknown')}")
-            details.append(
-                f"Health Status: {machine_details.get('healthStatus', 'Unknown')}"
-            )
+            details.append(f"Health Status: {machine_details.get('healthStatus', 'Unknown')}")
             details.append(f"Risk Score: {machine_details.get('riskScore', 'Unknown')}")
 
             result = {"value": 1, "details": details}
 
-            self.logger.info(f"Machine details retrieved successfully")
+            self.logger.info("Machine details retrieved successfully")
             self.logger.method_exit("get_result", result)
             return result
 
