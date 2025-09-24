@@ -9,7 +9,7 @@ A comprehensive **Nagios plugin** for monitoring Microsoft Defender for Endpoint
 ## ✨ Features
 
 - 🔐 **Dual Authentication** - Support for Client Secret and Certificate-based authentication
-- 🎯 **Multiple Endpoints** - Monitor onboarding status, last seen, vulnerabilities, alerts, and machine details
+- 🎯 **Multiple Endpoints** - Monitor onboarding status, last seen, vulnerabilities, products with CVEs, alerts, and machine details
 - 📊 **Nagios Compatible** - Standard exit codes and performance data output
 - 🏗️ **Clean Architecture** - Modular design with testable components
 - 🔧 **Flexible Configuration** - File-based configuration with sensible defaults
@@ -41,6 +41,9 @@ check_msdefender lastseen -d machine.domain.tld -W 7 -C 30
 # Check vulnerabilities
 check_msdefender vulnerabilities -d machine.domain.tld -W 10 -C 100
 
+# Check products with CVE vulnerabilities
+check_msdefender products -d machine.domain.tld -W 5 -C 1
+
 # Check alerts
 check_msdefender alerts -d machine.domain.tld -W 1 -C 5
 
@@ -58,6 +61,7 @@ check_msdefender detail -d machine.domain.tld
 | `onboarding` | Check machine onboarding status | W:1, C:2 |
 | `lastseen` | Days since machine last seen | W:7, C:30 |
 | `vulnerabilities` | Vulnerability score calculation | W:10, C:100 |
+| `products` | Count of vulnerable software with CVEs | W:5, C:1 |
 | `alerts` | Count of unresolved alerts | W:1, C:0 |
 | `machines` | List all machines | W:10, C:25 |
 | `detail` | Get detailed machine information | - |
@@ -69,6 +73,15 @@ The vulnerability score is calculated as:
 - **High vulnerabilities** × 10
 - **Medium vulnerabilities** × 5
 - **Low vulnerabilities** × 1
+
+### Products CVE Monitoring
+
+The products command monitors installed software with known CVE vulnerabilities:
+- **Groups CVEs by software** (name, version, vendor)
+- **Shows CVE details** including severity levels and disk paths
+- **Counts vulnerable software** (not individual CVEs)
+- **Default thresholds**: Warning at 5 vulnerable software, Critical at 1
+- **Displays up to 10 software entries** with first 5 CVEs per software
 
 ### Alert Monitoring
 
@@ -160,6 +173,11 @@ define command {
 }
 
 define command {
+    command_name    check_defender_products
+    command_line    $USER1$/check_msdefender/bin/check_msdefender products -d $HOSTALIAS$ -W 5 -C 1
+}
+
+define command {
     command_name    check_defender_alerts
     command_line    $USER1$/check_msdefender/bin/check_msdefender alerts -d $HOSTALIAS$ -W 1 -C 5
 }
@@ -192,6 +210,13 @@ define service {
 
 define service {
     use                     generic-service
+    service_description     DEFENDER_PRODUCTS
+    check_command           check_defender_products
+    hostgroup_name          msdefender
+}
+
+define service {
+    use                     generic-service
     service_description     DEFENDER_ALERTS
     check_command           check_defender_alerts
     hostgroup_name          msdefender
@@ -209,6 +234,7 @@ check_msdefender/
 │   │   ├── onboarding.py      # Onboarding status command
 │   │   ├── lastseen.py        # Last seen command
 │   │   ├── vulnerabilities.py # Vulnerabilities command
+│   │   ├── products.py        # Products CVE monitoring command
 │   │   ├── alerts.py          # Alerts monitoring command
 │   │   ├── machines.py        # List machines command
 │   │   └── detail.py          # Machine detail command
@@ -225,6 +251,7 @@ check_msdefender/
 │   ├── onboarding_service.py  # Onboarding business logic
 │   ├── lastseen_service.py    # Last seen business logic
 │   ├── vulnerabilities_service.py # Vulnerability business logic
+│   ├── products_service.py    # Products CVE monitoring business logic
 │   ├── alerts_service.py      # Alerts monitoring business logic
 │   ├── machines_service.py    # Machines business logic
 │   ├── detail_service.py      # Detail business logic

@@ -1,6 +1,6 @@
 """Machines service implementation."""
 
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 from check_msdefender.core.logging_config import get_verbose_logger
 
@@ -13,7 +13,9 @@ class MachinesService:
         self.defender = defender_client
         self.logger = get_verbose_logger(__name__, verbose_level)
 
-    def get_result(self) -> Dict[str, Any]:
+    def get_result(
+        self, machine_id: Optional[str] = None, dns_name: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Get machine count result with value and details."""
         self.logger.method_entry("get_result")
 

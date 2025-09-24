@@ -11,7 +11,8 @@
       "Bash(find:*)",
       "Bash(echo \"Exit code: $?\")",
       "Bash(mypy:*)",
-      "Bash(black:*)"
+      "Bash(black:*)",
+      "Bash(pdm run:*)"
     ],
     "deny": [],
     "ask": []

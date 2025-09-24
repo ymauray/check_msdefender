@@ -4,7 +4,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "check-msdefender"
-version = "1.1.6"
+dynamic = ["version"]
 authors = [
     {name = "ldvchosal", email = "ldvchosal@github.com"},
 ]
@@ -41,7 +41,8 @@ dev = [
     "mypy>=0.800",
     "twine>=6.2.0",
     "pdm>=2.0.0",
-    "ruff>=0.13.0"
+    "ruff>=0.13.0",
+    "pdm-bump"
 ]
 
 [project.urls]
@@ -61,10 +62,20 @@ line-length = 100
 target-version = ['py39']
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -73,15 +84,41 @@ python_classes = "Test*"
 python_functions = "test_*"
 addopts = "-v"
 
+[tool.pdm]
+distribution = true
+version = {source = "file", path = "check_msdefender/__init__.py"}
+
 [tool.pdm.scripts]
 format = "ruff format"
 typecheck = "mypy check_msdefender/"
-lint = "flake8 check_msdefender/"
 build = "python -m build"
 publish = "python -m twine upload dist/* --verbose"
-test = "pytest -v tests/"
 install = "pdm install"
+install-dev = "pdm install -G dev"
 clihelp = "check_msdefender --help"
 climachines = "check_msdefender machines"
 cli = {composite = ["clihelp", "climachines"]}
 all = {composite = ["install", "format", "build", "test", "cli"]}
+
+test = "env PYTHONPATH=src python -m pytest tests/ -v --cov=check_msdefender --cov-report=term-missing"
+test-quick = "env PYTHONPATH=src python -m pytest tests/ --tb=no -q"
+test-ci = "env PYTHONPATH=src python -m pytest tests/ -v --cov=check_msdefender --cov-report=term-missing -m 'not reverseproxy'"
+test-unit = "env PYTHONPATH=src python -m pytest tests/unit/ -v"
+test-integration = "env PYTHONPATH=src python -m pytest tests/integration/ -v"
+test-cov = "env PYTHONPATH=src python -m pytest tests/ -v --cov=check_msdefender --cov-report=html --cov-report=term-missing"
+lint = "ruff check check_msdefender/ tests/"
+lint-fix = "ruff check --fix check_msdefender/ tests/"
+format-check = "black --check check_msdefender/ tests/"
+check = ["lint", "format-check", "typecheck", "test"]
+bump-version = "pdm bump -v patch"
+env = "echo ${PATH}"
+clean = "rm -rf .coverage htmlcov/ .pytest_cache/ __pycache__/ check_msdefender/__pycache__/"
+version-show = "python -c 'import check_msdefender; print(xp.__version__)'"
+version-patch = "pdm bump patch"
+version-minor = "pdm bump minor"
+version-major = "pdm bump major"
+
+[tool.pdm-bump]
+version-files = [
+    "check_msdefender/__init__.py:__version__",
+]
