@@ -65,10 +65,7 @@ class DefenderClient:
             "Content-Type": DefenderClient.application_json,
         }
 
-        params = {
-            PARAM_FILTER: f"computerDnsName eq '{dns_name}'",
-            PARAM_SELECT: "id"
-        }
+        params = {PARAM_FILTER: f"computerDnsName eq '{dns_name}'", PARAM_SELECT: "id"}
 
         try:
             start_time = time.time()

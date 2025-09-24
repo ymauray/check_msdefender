@@ -82,9 +82,25 @@ class ProductsService:
             )
             software_vulnerabilities[software_key]["severities"].add(severity)
 
-        # Count vulnerable software
-        vulnerable_software = []
+        # Count vulnerabilities by severity
+        critical_count = 0
+        high_count = 0
+        medium_count = 0
+        low_count = 0
 
+        for vulnerability in products:
+            severity = vulnerability.get("vulnerabilitySeverityLevel", "Unknown").lower()
+            if severity == "critical":
+                critical_count += 1
+            elif severity == "high":
+                high_count += 1
+            elif severity == "medium":
+                medium_count += 1
+            elif severity == "low":
+                low_count += 1
+
+        # Count vulnerable software for reporting
+        vulnerable_software = []
         for software in software_vulnerabilities.values():
             if len(software["cves"]) > 0:
                 vulnerable_software.append(software)
@@ -92,7 +108,7 @@ class ProductsService:
         # Create details for output
         details = []
         if software_vulnerabilities:
-            summary_line = f"{len(products)} CVE found on {target_dns_name}"
+            summary_line = f"{len(products)} total CVEs (Critical: {critical_count}, High: {high_count}, Medium: {medium_count}, Low: {low_count}), {len(vulnerable_software)} vulnerable software"
             details.append(summary_line)
 
             # Add software details (limit to 10)
@@ -100,12 +116,13 @@ class ProductsService:
                 cve_count = len(software["cves"])
                 unique_cves = list(set(software["cves"]))
                 cve_list = ", ".join(unique_cves[:5])  # Show first 5 CVEs
+                severity = ", ".join(software["severities"])  # Show first 5 CVEs
                 if len(unique_cves) > 5:
                     cve_list += f".. (+{len(unique_cves) - 5} more)"
 
                 details.append(
                     f"{software['name']} {software['version']} ({software['vendor']}) - "
-                    f"{cve_count} weaknesses ({cve_list})"
+                    f"{cve_count} ({severity}) weaknesses ({cve_list})"
                 )
 
                 # Add paths (limit to 4)
@@ -113,23 +130,26 @@ class ProductsService:
                     details.append(f" - {path}")
 
         # Determine the value based on severity:
-        # - Vulnerable software triggers warnings
-        # - No vulnerabilities is OK
-        if vulnerable_software:
-            value = len(vulnerable_software)  # Will trigger warning threshold
-        else:
-            value = 0  # OK status
+        # - Critical vulnerabilities trigger critical threshold
+        # - High/Medium vulnerabilities trigger warning threshold
+        # - Low vulnerabilities or no vulnerabilities are OK
 
+        value = (critical_count * 100) + (high_count *10) + (medium_count*5) + (low_count*1)
         result = {
             "value": value,
             "details": details,
             "vulnerable_count": len(vulnerable_software),
+            "critical_count": critical_count,
+            "high_count": high_count,
+            "medium_count": medium_count,
+            "low_count": low_count,
             "total_cves": len(products),
             "total_software": len(software_vulnerabilities),
         }
 
         self.logger.info(
-            f"Products analysis complete: {len(products)} total CVEs, "
+            f"Products analysis complete: {len(products)} total CVEs "
+            f"(Critical: {critical_count}, High: {high_count}, Medium: {medium_count}, Low: {low_count}), "
             f"{len(vulnerable_software)} vulnerable software"
         )
         self.logger.method_exit("get_result", result)

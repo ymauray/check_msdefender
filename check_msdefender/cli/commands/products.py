@@ -25,8 +25,12 @@ def register_products_commands(main_group: Any) -> None:
         critical: Optional[float],
     ) -> None:
         """Check installed products for Microsoft Defender."""
-        warning = warning if warning is not None else 5
-        critical = critical if critical is not None else 1
+        warning = (
+            warning if warning is not None else 1
+        )  # Trigger warning on any high/medium severity
+        critical = (
+            critical if critical is not None else 1
+        )  # Trigger critical on any critical severity
 
         try:
             # Load configuration
