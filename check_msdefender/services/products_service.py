@@ -107,24 +107,37 @@ class ProductsService:
 
         # Create details for output
         details = []
+        total_score = 0
         if software_vulnerabilities:
             summary_line = f"{len(products)} total CVEs (Critical: {critical_count}, High: {high_count}, Medium: {medium_count}, Low: {low_count}), {len(vulnerable_software)} vulnerable software"
             details.append(summary_line)
 
+            score = 0
             # Add software details (limit to 10)
             for software in list(software_vulnerabilities.values())[:10]:
                 cve_count = len(software["cves"])
                 unique_cves = list(set(software["cves"]))
                 cve_list = ", ".join(unique_cves[:5])  # Show first 5 CVEs
-                severity = ", ".join(software["severities"])  # Show first 5 CVEs
+                severities = ", ".join(software["severities"])  # Show first 5 CVEs
+                for severity_name in software["severities"]:
+                    severity = severity_name.lower()
+                    if severity == "critical":
+                        score += 100
+                    elif severity == "high":
+                        score += 10
+                    elif severity == "medium":
+                        score += 5
+                    elif severity == "low":
+                        score += 1
+
                 if len(unique_cves) > 5:
                     cve_list += f".. (+{len(unique_cves) - 5} more)"
 
                 details.append(
                     f"{software['name']} {software['version']} ({software['vendor']}) - "
-                    f"{cve_count} ({severity}) weaknesses ({cve_list})"
+                    f"{score} ({cve_count}: {severities}) weaknesses ({cve_list})"
                 )
-
+                total_score += score
                 # Add paths (limit to 4)
                 for path in list(software["paths"])[:4]:
                     details.append(f" - {path}")
@@ -133,10 +146,8 @@ class ProductsService:
         # - Critical vulnerabilities trigger critical threshold
         # - High/Medium vulnerabilities trigger warning threshold
         # - Low vulnerabilities or no vulnerabilities are OK
-
-        value = (critical_count * 100) + (high_count *10) + (medium_count*5) + (low_count*1)
         result = {
-            "value": value,
+            "value": total_score,
             "details": details,
             "vulnerable_count": len(vulnerable_software),
             "critical_count": critical_count,
