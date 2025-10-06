@@ -6,6 +6,12 @@ from datetime import datetime
 from check_msdefender.core.exceptions import ValidationError
 from check_msdefender.core.logging_config import get_verbose_logger
 
+class DetailObject:
+    def __init__(self, software: str, data: str, score: int):
+        self.software = software
+        self.data = data
+        self.score = score
+        self.paths: list[str] = []
 
 class ProductsService:
     """Service for checking installed products on machines."""
@@ -140,42 +146,41 @@ class ProductsService:
                 if len(unique_cves) > 5:
                     cve_list += f".. (+{len(unique_cves) - 5} more)"
 
-                detail_object = {
-                    "software": f"{software['name']} {software['version']} ({software['vendor']})",
-                    "data": f"{score} ({cve_count}: {severities}) weaknesses ({cve_list})",
-                    "score": score,
-                    "paths": []
-                }
+                detail_object = DetailObject(
+                    software=f"{software['name']} {software['version']} ({software['vendor']})",
+                    data=f"{score} ({cve_count}: {severities}) weaknesses ({cve_list})",
+                    score=score
+                )
 
                 total_score += score
 
                 # Add paths (limit to 4)
                 for path in list(software["paths"])[:4]:
-                    detail_object["paths"].append(f" - {path}")
+                    detail_object.paths.append(f" - {path}")
 
                 # Indicate if more paths exist
                 if (len(software["paths"]) > 4):
-                    detail_object["paths"].append(f" - .. (+{len(software['paths']) - 4} more)")
-                    
+                    detail_object.paths.append(f" - .. (+{len(software['paths']) - 4} more)")
+
                 # Add registry paths if available (limit to 4)
                 for registry_path in list(software["registryPaths"])[:4]:
-                    detail_object["paths"].append(f" - {registry_path}")
-                
+                    detail_object.paths.append(f" - {registry_path}")
+
                 # Indicate if more registry paths exist
                 if (len(software["registryPaths"]) > 4):
-                    detail_object["paths"].append(f" - .. (+{len(software['registryPaths']) - 4} more)")
+                    detail_object.paths.append(f" - .. (+{len(software['registryPaths']) - 4} more)")
 
                 # Collect detail objects for sorting
                 detail_objects.append(detail_object)
 
             # Sort detail objects by score descending
-            detail_objects.sort(key=lambda x: x["score"], reverse=True)
+            detail_objects.sort(key=lambda x: x.score, reverse=True)
             
             # Limit to top 10
             for detail_object in detail_objects[:10]:
-                details.append(f"{detail_object["software"]} {detail_object["data"]}")
-                details.extend(detail_object["paths"])
-                
+                details.append(f"{detail_object.software} {detail_object.data}")
+                details.extend(detail_object.paths)
+
         # Determine the value based on severity:
         # - Critical vulnerabilities trigger critical threshold
         # - High/Medium vulnerabilities trigger warning threshold
