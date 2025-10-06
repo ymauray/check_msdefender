@@ -60,6 +60,7 @@ class ProductsService:
             cve_id = vulnerability.get("cveId", "Unknown")
             cvss_score = vulnerability.get("cvssScore", 0)
             disk_paths = vulnerability.get("diskPaths", [])
+            registry_paths = vulnerability.get("registryPaths", [])
             severity = vulnerability.get("vulnerabilitySeverityLevel", "Unknown")
 
             software_key = f"{software_name}-{software_version}-{software_vendor}"
@@ -71,6 +72,7 @@ class ProductsService:
                     "vendor": software_vendor,
                     "cves": [],
                     "paths": set(),
+                    "registryPaths": set(),
                     "max_cvss": 0,
                     "severities": set(),
                 }
@@ -78,6 +80,7 @@ class ProductsService:
             cve_info = {"cve_id": cve_id, "severity": severity}
             software_vulnerabilities[software_key]["cves"].append(cve_info)
             software_vulnerabilities[software_key]["paths"].update(disk_paths)
+            software_vulnerabilities[software_key]["registryPaths"].update(registry_paths)
             software_vulnerabilities[software_key]["max_cvss"] = max(
                 software_vulnerabilities[software_key]["max_cvss"], cvss_score
             )
@@ -117,7 +120,7 @@ class ProductsService:
             
             # Add software details
             for software in list(software_vulnerabilities.values()):
-            score = 0
+                score = 0
                     
                 cve_count = len(software["cves"])
                 unique_cves = list(set(cve["cve_id"] for cve in software["cves"]))
@@ -154,6 +157,14 @@ class ProductsService:
                 if (len(software["paths"]) > 4):
                     detail_object["paths"].append(f" - .. (+{len(software['paths']) - 4} more)")
                     
+                # Add registry paths if available (limit to 4)
+                for registry_path in list(software["registryPaths"])[:4]:
+                    detail_object["paths"].append(f" - {registry_path}")
+                
+                # Indicate if more registry paths exist
+                if (len(software["registryPaths"]) > 4):
+                    detail_object["paths"].append(f" - .. (+{len(software['registryPaths']) - 4} more)")
+
                 # Collect detail objects for sorting
                 detail_objects.append(detail_object)
 
@@ -164,7 +175,7 @@ class ProductsService:
             for detail_object in detail_objects[:10]:
                 details.append(f"{detail_object["software"]} {detail_object["data"]}")
                 details.extend(detail_object["paths"])
-
+                
         # Determine the value based on severity:
         # - Critical vulnerabilities trigger critical threshold
         # - High/Medium vulnerabilities trigger warning threshold
