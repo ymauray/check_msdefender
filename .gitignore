@@ -5,3 +5,6 @@
 /check_msdefender.ini
 /doc/private
 /.pdm-build/
+.venv
+__pycache__/
+*.pyc
