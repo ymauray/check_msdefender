@@ -6,6 +6,12 @@ from datetime import datetime
 from check_msdefender.core.exceptions import ValidationError
 from check_msdefender.core.logging_config import get_verbose_logger
 
+class DetailObject:
+    def __init__(self, software: str, data: str, score: int):
+        self.software = software
+        self.data = data
+        self.score = score
+        self.paths: list[str] = []
 
 class ProductsService:
     """Service for checking installed products on machines."""
@@ -60,6 +66,7 @@ class ProductsService:
             cve_id = vulnerability.get("cveId", "Unknown")
             cvss_score = vulnerability.get("cvssScore", 0)
             disk_paths = vulnerability.get("diskPaths", [])
+            registry_paths = vulnerability.get("registryPaths", [])
             severity = vulnerability.get("vulnerabilitySeverityLevel", "Unknown")
 
             software_key = f"{software_name}-{software_version}-{software_vendor}"
@@ -71,12 +78,15 @@ class ProductsService:
                     "vendor": software_vendor,
                     "cves": [],
                     "paths": set(),
+                    "registryPaths": set(),
                     "max_cvss": 0,
                     "severities": set(),
                 }
 
-            software_vulnerabilities[software_key]["cves"].append(cve_id)
+            cve_info = {"cve_id": cve_id, "severity": severity}
+            software_vulnerabilities[software_key]["cves"].append(cve_info)
             software_vulnerabilities[software_key]["paths"].update(disk_paths)
+            software_vulnerabilities[software_key]["registryPaths"].update(registry_paths)
             software_vulnerabilities[software_key]["max_cvss"] = max(
                 software_vulnerabilities[software_key]["max_cvss"], cvss_score
             )
@@ -112,15 +122,18 @@ class ProductsService:
             summary_line = f"{len(products)} total CVEs (Critical: {critical_count}, High: {high_count}, Medium: {medium_count}, Low: {low_count}), {len(vulnerable_software)} vulnerable software"
             details.append(summary_line)
 
-            score = 0
-            # Add software details (limit to 10)
-            for software in list(software_vulnerabilities.values())[:10]:
+            detail_objects = []
+            
+            # Add software details
+            for software in list(software_vulnerabilities.values()):
+                score = 0
+                    
                 cve_count = len(software["cves"])
-                unique_cves = list(set(software["cves"]))
+                unique_cves = list(set(cve["cve_id"] for cve in software["cves"]))
                 cve_list = ", ".join(unique_cves[:5])  # Show first 5 CVEs
                 severities = ", ".join(software["severities"])  # Show first 5 CVEs
-                for severity_name in software["severities"]:
-                    severity = severity_name.lower()
+                for cve in software["cves"]:
+                    severity = cve["severity"].lower()
                     if severity == "critical":
                         score += 100
                     elif severity == "high":
@@ -133,14 +146,40 @@ class ProductsService:
                 if len(unique_cves) > 5:
                     cve_list += f".. (+{len(unique_cves) - 5} more)"
 
-                details.append(
-                    f"{software['name']} {software['version']} ({software['vendor']}) - "
-                    f"{score} ({cve_count}: {severities}) weaknesses ({cve_list})"
+                detail_object = DetailObject(
+                    software=f"{software['name']} {software['version']} ({software['vendor']})",
+                    data=f"{score} ({cve_count}: {severities}) weaknesses ({cve_list})",
+                    score=score
                 )
+
                 total_score += score
+
                 # Add paths (limit to 4)
                 for path in list(software["paths"])[:4]:
-                    details.append(f" - {path}")
+                    detail_object.paths.append(f" - {path}")
+
+                # Indicate if more paths exist
+                if (len(software["paths"]) > 4):
+                    detail_object.paths.append(f" - .. (+{len(software['paths']) - 4} more)")
+
+                # Add registry paths if available (limit to 4)
+                for registry_path in list(software["registryPaths"])[:4]:
+                    detail_object.paths.append(f" - {registry_path}")
+
+                # Indicate if more registry paths exist
+                if (len(software["registryPaths"]) > 4):
+                    detail_object.paths.append(f" - .. (+{len(software['registryPaths']) - 4} more)")
+
+                # Collect detail objects for sorting
+                detail_objects.append(detail_object)
+
+            # Sort detail objects by score descending
+            detail_objects.sort(key=lambda x: x.score, reverse=True)
+            
+            # Limit to top 10
+            for detail_object in detail_objects[:10]:
+                details.append(f"{detail_object.software} {detail_object.data}")
+                details.extend(detail_object.paths)
 
         # Determine the value based on severity:
         # - Critical vulnerabilities trigger critical threshold
