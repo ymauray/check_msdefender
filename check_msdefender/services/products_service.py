@@ -55,7 +55,7 @@ class ProductsService:
             product for product in all_products if product.get("deviceId") == target_machine_id
         ]
 
-        self.logger.info(f"Found {len(products)} CVE vulnerabilities for machine {target_dns_name}")
+        self.logger.info(f"Found {len(products)} vulnerabilities for machine {target_dns_name}")
 
         # Group vulnerabilities by software
         software_vulnerabilities = {}
@@ -119,11 +119,9 @@ class ProductsService:
         details = []
         total_score = 0
         if software_vulnerabilities:
-            summary_line = f"{len(products)} total CVEs (Critical: {critical_count}, High: {high_count}, Medium: {medium_count}, Low: {low_count}), {len(vulnerable_software)} vulnerable software"
-            details.append(summary_line)
 
             detail_objects = []
-            
+
             # Add software details
             for software in list(software_vulnerabilities.values()):
                 score = 0
@@ -148,8 +146,8 @@ class ProductsService:
 
                 detail_object = DetailObject(
                     software=f"{software['name']} {software['version']} ({software['vendor']})",
-                    data=f"{score} ({cve_count}: {severities}) weaknesses ({cve_list})",
-                    score=score
+                    data=f"Score: {score}, CVEs: {cve_count} ({severities}), ({cve_list})",
+                    score=score,
                 )
 
                 total_score += score
@@ -173,13 +171,18 @@ class ProductsService:
                 # Collect detail objects for sorting
                 detail_objects.append(detail_object)
 
+            summary_line = f"{len(vulnerable_software)} vulnerable products, score: {total_score}"
+            details.append(summary_line)
+            details.append("")
+
             # Sort detail objects by score descending
             detail_objects.sort(key=lambda x: x.score, reverse=True)
-            
+
             # Limit to top 10
             for detail_object in detail_objects[:10]:
-                details.append(f"{detail_object.software} {detail_object.data}")
+                details.append(f"{detail_object.software} - {detail_object.data}")
                 details.extend(detail_object.paths)
+                details.append("")
 
         # Determine the value based on severity:
         # - Critical vulnerabilities trigger critical threshold
@@ -198,9 +201,7 @@ class ProductsService:
         }
 
         self.logger.info(
-            f"Products analysis complete: {len(products)} total CVEs "
-            f"(Critical: {critical_count}, High: {high_count}, Medium: {medium_count}, Low: {low_count}), "
-            f"{len(vulnerable_software)} vulnerable software"
+            f"Products analysis complete: {len(vulnerable_software)} vulnerable products, score: {total_score}"
         )
         self.logger.method_exit("get_result", result)
         return result
