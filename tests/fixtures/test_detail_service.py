@@ -81,6 +81,7 @@ class TestDetailServiceFixtures:
         """Test that all expected machine detail fields are present."""
         self.service.get_result(machine_id="test-machine-3")
         details = self.service.get_machine_details_json()
+        assert details is not None
         details_dict = json.loads(details)
 
         # Verify all expected fields from the documentation are present
@@ -122,6 +123,7 @@ class TestDetailServiceFixtures:
         details = self.service.get_machine_details_json()
 
         # Should be valid JSON
+        assert details is not None
         details_dict = json.loads(details)
         assert isinstance(details_dict, dict)
 
