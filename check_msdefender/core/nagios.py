@@ -129,12 +129,9 @@ class NagiosPlugin:
                 DefenderSummary(details),
             )
 
-            # Set verbosity
-            check.verbosity = verbose
-
             # Run check and return exit code instead of exiting
             try:
-                check.main()
+                check.main(verbose=verbose)
                 return 0  # If main() doesn't exit, it's OK
             except SystemExit as e:
                 return int(e.code) if e.code is not None else 0
