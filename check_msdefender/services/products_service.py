@@ -80,7 +80,7 @@ class ProductsService:
                     "paths": set(),
                     "registryPaths": set(),
                     "max_cvss": 0,
-                    "severities": set(),
+                    "severities": [],
                 }
 
             cve_info = {"cve_id": cve_id, "severity": severity}
@@ -90,7 +90,7 @@ class ProductsService:
             software_vulnerabilities[software_key]["max_cvss"] = max(
                 software_vulnerabilities[software_key]["max_cvss"], cvss_score
             )
-            software_vulnerabilities[software_key]["severities"].add(severity)
+            software_vulnerabilities[software_key]["severities"].append(severity)
 
         # Count vulnerabilities by severity
         critical_count = 0
@@ -129,7 +129,15 @@ class ProductsService:
                 cve_count = len(software["cves"])
                 unique_cves = list(set(cve["cve_id"] for cve in software["cves"]))
                 cve_list = ", ".join(unique_cves[:5])  # Show first 5 CVEs
-                severities = ", ".join(software["severities"])  # Show first 5 CVEs
+                severities = ""
+                # Count severities
+                severity_counts = {"Critical": 0, "High": 0, "Medium": 0, "Low": 0}
+                for sev in software["severities"]:
+                    severity_counts[sev] += 1
+                severities = ", ".join(
+                    f"{key}: {value}" for key, value in severity_counts.items() if value > 0
+                )
+
                 for cve in software["cves"]:
                     severity = cve["severity"].lower()
                     if severity == "critical":
